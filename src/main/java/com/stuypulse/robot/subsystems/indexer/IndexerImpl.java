@@ -1,6 +1,7 @@
 package com.stuypulse.robot.subsystems.indexer;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.constants.Settings;
 import com.stuypulse.stuylib.streams.booleans.BStream;
 import com.stuypulse.stuylib.streams.booleans.filters.BDebounce;
@@ -19,16 +20,16 @@ public class IndexerImpl extends Indexer {
     
     public IndexerImpl() {
 
-        leftMotor = new TalonFX(0,"");
-        rightMotor = new TalonFX(1, "");
+        leftMotor = new TalonFX(Ports.Indexer.LEFT_MOTOR);
+        rightMotor = new TalonFX(Ports.Indexer.RIGHT_MOTOR);
         // motor configs go here
-        frontBeamBreak = new DigitalInput(0);
-        backBeamBreak = new DigitalInput(1);
+        frontBeamBreak = new DigitalInput(Ports.Indexer.FRONT_BEAM_BREAK);
+        backBeamBreak = new DigitalInput(Ports.Indexer.BACK_BEAM_BREAK);
 
         passedFrontBeam = BStream.create(frontBeamBreak).not()
-                    .filtered(new BDebounce.Both(0.01));
+                    .filtered(new BDebounce.Both(Settings.Indexer.CORAL_IN_PLACE_DEBOUNCE));
         passedBackBeam = BStream.create(backBeamBreak).not()
-                    .filtered(new BDebounce.Both(0.01));
+                    .filtered(new BDebounce.Both(Settings.Indexer.CORAL_IN_PLACE_DEBOUNCE));
     }
 
     public boolean coralInPlace() {
@@ -47,6 +48,5 @@ public class IndexerImpl extends Indexer {
 
         SmartDashboard.putBoolean("Shooter/Coral in Place", coralInPlace());
 
-        
     }
 }
