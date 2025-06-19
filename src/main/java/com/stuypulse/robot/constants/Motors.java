@@ -34,6 +34,20 @@ public interface Motors {
 
     /** Classes to store all of the values a motor needs */
 
+    public interface Elevator {
+        TalonFXConfig elevatorConfig = new TalonFXConfig()
+            .withCurrentLimitAmps(0)
+            .withSupplyCurrentLimitAmps(0)
+            .withRampRate(0)
+            .withNeutralMode(NeutralModeValue.Brake)
+            .withInvertedValue(null)
+            .withPIDConstants(0, 0, 0, 0)
+            .withFFConstants(0, 0, 0, 0)
+            .withGravityType(GravityTypeValue.Elevator_Static)
+            .withSensorToMechanismRatio(0)
+            .withMotionProfile(0, 0);
+    }
+
     public static class TalonFXConfig {
         private final TalonFXConfiguration configuration = new TalonFXConfiguration();
         private final Slot0Configs slot0Configs = new Slot0Configs();

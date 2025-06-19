@@ -18,4 +18,8 @@ public interface Settings {
     public interface Indexer{
         double CORAL_IN_PLACE_DEBOUNCE = 0.0;
     }
+
+    public interface Elevator {
+        double HEIGHT_TOLERANCE = 0;
+    }
 }
