@@ -12,19 +12,21 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public abstract class Intake extends SubsystemBase {
     
-    public static final Intake instance;
+    public static final Intake instance = new IntakeImpl();
 
-    static {
-        if (Robot.isReal()) {
-            instance = new IntakeImpl();
-        }
-    }
+    // static {
+    //     if (Robot.isReal()) {
+    //         instance = new IntakeImpl();
+    //     } else {
+    //         // instance = new IntakeSim();
+    //     }
+    // }
 
     public static Intake getInstance() {
         return instance;
     }
 
-     public enum PivotState {
+    public enum PivotState {
         STOW(Settings.Intake.STOW_ANGLE),
         INTAKING(Settings.Intake.INTAKING_ANGLE);
 
@@ -40,22 +42,21 @@ public abstract class Intake extends SubsystemBase {
         }
     }
 
-        public enum RollerState {
+    public enum RollerState {
+        INTAKING(Settings.Intake.INTAKING_SPEED),
+        EJECTING(Settings.Intake.EJECTING_SPEED),
+        STOP(0);
 
-            INTAKING(Settings.Intake.INTAKING_SPEED),
-            EJECTING(Settings.Intake.EJECTING_SPEED),
-            STOP(0);
-    
-            private double speed;
-    
-            private RollerState(double speed) {
-                this.speed = speed;
-            }
-    
-            public double getTargetSpeed() {
-                return this.speed;
-            }
+        private double speed;
+
+        private RollerState(double speed) {
+            this.speed = speed;
         }
+
+        public double getTargetSpeed() {
+            return this.speed;
+        }
+    }
 
     private PivotState pivotState;
     private RollerState rollerState;
@@ -84,8 +85,7 @@ public abstract class Intake extends SubsystemBase {
     // public abstract SysIdRoutine getPivotSysIdRoutine();
 
     public abstract void zeroAngle();
-
-    public abstract boolean isAtIntakingAngle();
+    public abstract boolean atTargetAngle();
 
     @Override
     public void periodic() {

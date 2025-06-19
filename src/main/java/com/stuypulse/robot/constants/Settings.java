@@ -29,8 +29,9 @@ public interface Settings {
 
         double INTAKING_SPEED = 1.0;
         double EJECTING_SPEED = -1.0;
+        double CURRENT_HOMING_DEBOUNCE_SECS = 0.5;
 
-        Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.0);
+        double ANGLE_TOLERANCE_DEG = 5.0;
 
         public interface Constraints {
 

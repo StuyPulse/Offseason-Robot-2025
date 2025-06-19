@@ -12,4 +12,9 @@ public interface Ports {
         int OPERATOR = 1;
         int DEBUGGER = 2;
     }
+
+    public interface Intake {
+        int PIVOT_MOTOR = 0;
+        int ROLLER_MOTOR = 0;
+    }
 }
