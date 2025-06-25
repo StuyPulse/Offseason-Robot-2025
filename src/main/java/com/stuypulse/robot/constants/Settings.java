@@ -34,10 +34,8 @@ public interface Settings {
         double ANGLE_TOLERANCE_DEG = 5.0;
 
         public interface Constraints {
-
-            Rotation2d MAX_VEL = Rotation2d.fromDegrees(0.0);
-            Rotation2d MAX_ACCEL = Rotation2d.fromDegrees(0.0);
-
+            Rotation2d MAX_ANGULAR_VEL = Rotation2d.fromDegrees(0.0); // deg/s
+            Rotation2d MAX_ANGULAR_ACCEL = Rotation2d.fromDegrees(0.0); // deg/s^2
         }
 
 

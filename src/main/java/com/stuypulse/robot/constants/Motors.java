@@ -41,12 +41,14 @@ public interface Motors {
 			.withInvertedValue(InvertedValue.CounterClockwise_Positive);
 
         TalonFXConfig PIVOT_MOTOR_CONFIG = new TalonFXConfig()
-            .withFFConstants(0, 0, 0, 0, 0)
-            .withPIDConstants(0, 0, 0, 0)
+            .withFFConstants(Gains.Intake.FF.kS, Gains.Intake.FF.kV, Gains.Intake.FF.kA, Gains.Intake.FF.kG, 0)
+            .withPIDConstants(Gains.Intake.PID.kP, Gains.Intake.PID.kI, Gains.Intake.PID.kD, 0)
             .withCurrentLimitAmps(80) //40
 			.withRampRate(0.25)
 			.withNeutralMode(NeutralModeValue.Brake)
-			.withInvertedValue(InvertedValue.CounterClockwise_Positive);
+			.withInvertedValue(InvertedValue.CounterClockwise_Positive)
+            .withMotionProfile(Settings.Intake.Constraints.MAX_ANGULAR_VEL.getDegrees(), Settings.Intake.Constraints.MAX_ANGULAR_ACCEL.getDegrees())
+            .withSensorToMechanismRatio(Constants.Intake.PIVOT_GEAR_RATIO);
     }
 
     public static class TalonFXConfig {
