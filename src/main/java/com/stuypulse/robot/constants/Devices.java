@@ -1,13 +1,15 @@
-/************************ PROJECT PHIL ************************/
-/* Copyright (c) 2024 StuyPulse Robotics. All rights reserved.*/
+/************************ PROJECT 2025 ************************/
+/* Copyright (c) 2025 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
 
 package com.stuypulse.robot.constants;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
@@ -20,6 +22,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 /*-
  * File containing all of the configurations that different motors require.
@@ -30,8 +33,52 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
  *  - The Current Limit
  *  - The Open Loop Ramp Rate
  */
-public interface Motors {
+public interface Devices {
 
+    public interface DoubleJointedArm {
+        public interface Shoulder {
+            TalonFXConfig motor_config = new TalonFXConfig()
+            .withCurrentLimitAmps(80)
+                .withRampRate(0.25)
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInvertedValue(InvertedValue.Clockwise_Positive)
+                .withPIDConstants(0, 0, 0, 0)
+                .withFFConstants(0, 0, 0, 0)
+                .withGravityType(GravityTypeValue.Arm_Cosine)
+                .withSensorToMechanismRatio(0)
+                .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.SHOULDER_GR)
+                .withMotionProfile(0, 0);
+
+            CANcoderConfiguration cc_config = new CANcoderConfiguration()
+            .withMagnetSensor(
+                new MagnetSensorConfigs()
+                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                    .withMagnetOffset(Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT)
+                    .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Shoulder.ENCODER_UPPER_LIMIT_ROT));
+        }
+
+        public interface Elbow {
+            TalonFXConfig motor_config = new TalonFXConfig()
+            .withCurrentLimitAmps(80)
+                .withRampRate(0.25)
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInvertedValue(InvertedValue.Clockwise_Positive)
+                .withPIDConstants(0, 0, 0, 0)
+                .withFFConstants(0, 0, 0, 0)
+                .withGravityType(GravityTypeValue.Arm_Cosine)
+                .withSensorToMechanismRatio(0)
+                .withRemoteSensor(Ports.DoubleJointedArm.ELBOW_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.ELBOW_GR)
+                .withMotionProfile(0, 0);
+            
+            CANcoderConfiguration cc_config = new CANcoderConfiguration()
+            .withMagnetSensor(
+                new MagnetSensorConfigs()
+                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                    .withMagnetOffset(Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT)
+                    .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Elbow.ENCODER_UPPER_LIMIT_ROT));
+
+        }
+    }
     /** Classes to store all of the values a motor needs */
 
     public static class TalonFXConfig {

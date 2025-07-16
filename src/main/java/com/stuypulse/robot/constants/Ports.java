@@ -12,4 +12,12 @@ public interface Ports {
         int OPERATOR = 1;
         int DEBUGGER = 2;
     }
+
+    public interface DoubleJointedArm {
+        int SHOULDER_MOTOR = 0;
+        int SHOULDER_ENCODER = 0;
+        int ELBOW_MOTOR = 0;
+        int ELBOW_ENCODER = 0;
+        int PIGEON = 0;
+    }
 }
