@@ -52,6 +52,4 @@ public interface DoubleJointedArmIO {
     public abstract Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
     public abstract Translation2d getEndPosition();
 
-    
-
 }

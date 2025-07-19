@@ -1,5 +1,9 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.stuylib.math.SLMath;
@@ -52,6 +56,8 @@ public class DoubleJointedArm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("DoubleJointedArm", inputs);
         // PUT ALL CALLS TO CONTROL METHODS HERE
     }
 

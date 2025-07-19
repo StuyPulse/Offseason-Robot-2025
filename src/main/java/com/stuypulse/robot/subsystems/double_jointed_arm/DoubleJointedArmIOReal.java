@@ -3,12 +3,18 @@ package com.stuypulse.robot.subsystems.double_jointed_arm;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Ports;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Angle;
@@ -86,5 +92,59 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         shoulderCurrentAmps.setUpdateFrequency(250);
         elbowCurrentAmps.setUpdateFrequency(250);
     }
+
+    // STATES
+    @Override
+    public void updateInputs(DoubleJointedArmIOInputs inputs) {
+
+    };
+
+    // CONTROL
+    
+    public void runTorqueCurrentShoulder(double rotations, double torqueCurrentAmps) {
+        shoulder.setControl(new MotionMagicTorqueCurrentFOC(rotations).withFeedForward(torqueCurrentAmps));
+    }
+
+    public void runTorqueCurrentElbow(double rotations, double torqueCurrentAmps) {
+        elbow.setControl(new MotionMagicTorqueCurrentFOC(rotations).withFeedForward(torqueCurrentAmps));
+    }
+
+    public void runVoltsShoulder(double volts) { // ONLY voltage override
+        shoulder.setControl(new VoltageOut(volts));
+    }
+
+    public void runVoltsElbow(double volts) { // ONLY voltage override
+        elbow.setControl(new VoltageOut(volts));
+    }
+
+    public void setPID(double kP, double kI, double kD) {
+
+    }
+
+    // BOOLEANS
+    @Override
+    public boolean isShoulderAtTarget(Rotation2d shoulderTargetAngle) {
+        double currentAngle = shoulderAngle.getValueAsDouble() * 2 * Math.PI; // Convert to radians
+        double targetAngle = shoulderTargetAngle.getRadians();
+        return Math.abs(currentAngle - targetAngle) < SHOULDER_TOLERANCE;
+    }
+
+    @Override
+    public boolean isElbowAtTarget(Rotation2d elbowTargetAngle) {
+        double currentAngle = elbowAngle.getValueAsDouble() * 2 * Math.PI; // Convert to radians
+        double targetAngle = elbowTargetAngle.getRadians();
+        return Math.abs(currentAngle - targetAngle) < ELBOW_TOLERANCE;
+    }
+
+    @Override
+    public boolean isArmAtTarget() {
+        return isShoulderAtTarget() && isElbowAtTarget();
+    }
+
+    // MATH
+    public Matrix<N2, N2> calculateMMatrix(); // Mass Inertia Matrix
+    public Matrix<N2, N2> calculateCMatrix(); // Centrifugal + Coriolis Matrix
+    public Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
+    public Translation2d getEndPosition();
 
 }
