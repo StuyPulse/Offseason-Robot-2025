@@ -22,29 +22,28 @@ public interface DoubleJointedArmIO {
         double shoulderAngle,
         double shoulderAngularVel,
         double shoulderAngularAccel,
-        double shoulderAppliedVolts,
+        double shoulderAppliedVoltage,
         double shoulderCurrentAmps,
 
         double elbowAngle,
         double elbowAngularAccel,
         double elbowAngularVel,
-        double elbowAppliedVolts,
+        double elbowAppliedVoltage,
         double elbowCurrentAmps) {}
 
     // STATES
     public abstract void updateInputs(DoubleJointedArmIOInputs inputs);
 
     // CONTROL
-    public abstract void runTorqueCurrentShoulder(double torqueCurrentAmps);
-    public abstract void runTorqueCurrentElbow(double torqueCurrentAmps);
-    public abstract void runVolts(double volts); // ONLY voltage override
-    public abstract void setTargetAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle);
-    public abstract void setPID(double kP, double kI, double kD);
+    public abstract void runTorqueCurrentShoulder(Rotation2d targetRotation, double torqueCurrentAmps);
+    public abstract void runTorqueCurrentElbow(Rotation2d targetRotation, double torqueCurrentAmps);
+    public abstract void runVoltsShoulder(double volts); // ONLY voltage override
+    public abstract void runVoltsElbow(double volts); // ONLY voltage override
 
     // BOOLEANS
-    public abstract boolean isShoulderAtTarget();
-    public abstract boolean isElbowAtTarget();
-    public abstract boolean isArmAtTarget();
+    public abstract boolean isShoulderAtTarget(Rotation2d shoulderTargetAngle);
+    public abstract boolean isElbowAtTarget(Rotation2d elbowTargetAngle);
+    public abstract boolean isArmAtTarget(Rotation2d shoulderTargetAngle, Rotation2d elbowTargetAngle);
 
     // MATH
     public abstract Matrix<N2, N2> calculateMMatrix(); // Mass Inertia Matrix
