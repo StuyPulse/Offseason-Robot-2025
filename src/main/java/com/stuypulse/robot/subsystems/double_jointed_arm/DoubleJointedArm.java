@@ -31,14 +31,19 @@ public class DoubleJointedArm extends SubsystemBase {
     private DoubleJointedArmIOInputsAutoLogged inputs = new DoubleJointedArmIOInputsAutoLogged();
 
     private ArmState state;
+    private ArmState storedState;
+    private boolean intermediate;
 
     public DoubleJointedArm(DoubleJointedArmIO io) {
         this.io = io;
-        this.state = ArmState.STOW;
+        state = ArmState.STOW;
+        storedState = ArmState.STOW;
+        intermediate = false;
     }
 
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
+        INT(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)),
         L4_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
         L4_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
         L3_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
@@ -48,16 +53,16 @@ public class DoubleJointedArm extends SubsystemBase {
         L1_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
         L1_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10));
 
-        private Rotation2d shoulderAngle;
-        private Rotation2d elbowAngle;
-
         private ArmState(Rotation2d shoulderAngle, Rotation2d elbowAngle){
             this.shoulderAngle = shoulderAngle;
             this.elbowAngle = elbowAngle;
-        } 
+        }
 
-        public Rotation2d getShoulderTargetAngle() { return shoulderAngle; }
-        public Rotation2d getElbowTargetAngle() { return elbowAngle; }
+        private Rotation2d shoulderAngle;
+        private Rotation2d elbowAngle;
+
+        public Rotation2d getShoulderTarget() { return shoulderAngle; }
+        public Rotation2d getElbowTarget() { return elbowAngle; }
 
         public ArmState getOpposite() {
             switch (this) {
@@ -74,43 +79,53 @@ public class DoubleJointedArm extends SubsystemBase {
         }
 
         public boolean isFront() {
-            return this.name().endsWith("FRONT");
+            return this.name().endsWith("FRONT") || this.equals(ArmState.STOW);
         }
     }
 
-    public void setState(ArmState state) { this.state = state; }
-    public void switchSides() { state = state.getOpposite(); }
+    public void setState(ArmState state) { 
+        this.state = state; 
+    }
+
+    public void switchSides() { 
+        if (!intermediate) {
+            intermediate = true;
+            storedState = state.getOpposite();
+            setState(ArmState.INT);
+        }
+    }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("DoubleJointedArm", inputs);
-
         Logger.recordOutput("DoubleJointedArm/CurrentState", state.name());
-        Logger.recordOutput("DoubleJointedArm/ShoulderTarget", state.getShoulderTargetAngle().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/ElbowTarget", state.getElbowTargetAngle().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/AtTarget", isArmAtTarget(state.getElbowTargetAngle(), state.getShoulderTargetAngle()));
+        Logger.recordOutput("DoubleJointedArm/ShoulderTarget", state.getShoulderTarget().getDegrees());
+        Logger.recordOutput("DoubleJointedArm/ElbowTarget", state.getElbowTarget().getDegrees());
+        Logger.recordOutput("DoubleJointedArm/AtTarget", isArmAtTarget(state.getElbowTarget(), state.getShoulderTarget()));
 
-        // PUT ALL CALLS TO CONTROL METHODS HERE
-        Matrix<N2, N1> positions = VecBuilder.fill(
-            Math.toRadians(inputs.shoulderAngle), 
-            Math.toRadians(inputs.elbowAngle)
-        );
-    
-        Matrix<N2, N1> velocities = VecBuilder.fill(
-            Math.toRadians(inputs.shoulderAngularVel),
-            Math.toRadians(inputs.elbowAngularVel)
-        );
-    
-        Matrix<N2, N1> accelerations = VecBuilder.fill(
-            Math.toRadians(inputs.shoulderAngularAccel),
-            Math.toRadians(inputs.elbowAngularAccel)
-        );
+        double shoulderAngleRad = Math.toRadians(inputs.shoulderAngle);
+        double elbowRelativeRad = Math.toRadians(inputs.elbowAngle - inputs.shoulderAngle);
 
+        double shoulderVelRad = Math.toRadians(inputs.shoulderAngularVel);
+        double elbowRelativeVelRad = Math.toRadians(inputs.elbowAngularVel - inputs.shoulderAngularVel);
+
+        double shoulderAccelRad = Math.toRadians(inputs.shoulderAngularAccel);
+        double elbowRelativeAccelRad = Math.toRadians(inputs.elbowAngularAccel - inputs.shoulderAngularAccel);
+
+        Matrix<N2, N1> positions = VecBuilder.fill(shoulderAngleRad, elbowRelativeRad);
+        Matrix<N2, N1> velocities = VecBuilder.fill(shoulderVelRad, elbowRelativeVelRad);
+        Matrix<N2, N1> accelerations = VecBuilder.fill(shoulderAccelRad, elbowRelativeAccelRad);
+        
         Matrix<N2, N1> ff = feedforwardVoltage(positions, velocities, accelerations);
+        
+        if (intermediate && atTarget()) {
+            setState(storedState);
+            intermediate = false;
+        }
 
-        io.controlShoulder(state.getShoulderTargetAngle(), ff.get(0, 0));
-        io.controlElbow(state.getElbowTargetAngle(), ff.get(1, 0));
+        io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
+        io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
     }
 
     /* GETTERS */
@@ -145,7 +160,7 @@ public class DoubleJointedArm extends SubsystemBase {
     
     @AutoLogOutput
     public boolean atTarget() {
-        return isArmAtTarget(state.getShoulderTargetAngle(), state.getElbowTargetAngle());
+        return isArmAtTarget(state.getShoulderTarget(), state.getElbowTarget());
     }
 
     @AutoLogOutput
@@ -197,7 +212,7 @@ public class DoubleJointedArm extends SubsystemBase {
     private final double ELBOW_GEAR_RATIO = Constants.DoubleJointedArm.Elbow.GEAR_RATIO;
 
     /*
-     * @param position The angles of the joints, (θ1, θ2). Note that θ2 is relative to the first joint, not the horizontal.
+     * @param position The angles of the joints, (θ1, θ2). Note that θ2 is relative to the first joint, not the horizontal
      * @param velocity The velocities of the joints in deg/s
      * @param acceleration The accelerations of the joints in deg/s^2
      */
