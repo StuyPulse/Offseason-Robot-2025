@@ -91,15 +91,16 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         );
 
         inputs.shoulderMotorConnected = shoulder.isConnected();
-        inputs.shoulderAngle = shoulder.getPosition().getValueAsDouble();
-        inputs.shoulderAngularVel = shoulder.getVelocity().getValueAsDouble();
-        inputs.shoulderAngularAccel = shoulder.getAcceleration().getValueAsDouble();
+        inputs.shoulderAngle = shoulder.getPosition().getValueAsDouble() * 360;
+        inputs.shoulderAngularVel = shoulder.getVelocity().getValueAsDouble() * 360;
+        inputs.shoulderAngularAccel = shoulder.getAcceleration().getValueAsDouble() * 360;
         inputs.shoulderAppliedVoltage = shoulder.getMotorVoltage().getValueAsDouble();
         inputs.shoulderCurrentAmps = shoulder.getTorqueCurrent().getValueAsDouble();
 
-        inputs.elbowAngle = elbow.getPosition().getValueAsDouble();
-        inputs.elbowAngularVel = elbow.getVelocity().getValueAsDouble();
-        inputs.elbowAngularAccel = elbow.getAcceleration().getValueAsDouble();
+        inputs.elbowMotorConnected = elbow.isConnected();
+        inputs.elbowAngle = elbow.getPosition().getValueAsDouble() * 360;
+        inputs.elbowAngularVel = elbow.getVelocity().getValueAsDouble() * 360;
+        inputs.elbowAngularAccel = elbow.getAcceleration().getValueAsDouble() * 360;
         inputs.elbowAppliedVoltage = elbow.getMotorVoltage().getValueAsDouble();
         inputs.elbowCurrentAmps = elbow.getTorqueCurrent().getValueAsDouble();
     }
