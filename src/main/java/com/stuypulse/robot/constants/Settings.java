@@ -5,9 +5,6 @@
 
 package com.stuypulse.robot.constants;
 
-import com.stuypulse.stuylib.network.SmartBoolean;
-import com.stuypulse.stuylib.network.SmartNumber;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /*-
@@ -25,5 +22,9 @@ public interface Settings {
         public interface Elbow {
             Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
         }
+    }
+
+    public interface Wrist {
+        Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
     }
 }

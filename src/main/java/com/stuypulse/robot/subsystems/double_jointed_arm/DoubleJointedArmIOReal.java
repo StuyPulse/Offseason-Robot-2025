@@ -79,7 +79,6 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         elbowCurrentAmps.setUpdateFrequency(250);
     }
 
-    // STATES
     @Override
     public void updateInputs(DoubleJointedArmIOInputs inputs) { // called periodically in subsystem
         // Clear cache
@@ -113,7 +112,6 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         return Rotation2d.fromRotations(elbowAngle.getValueAsDouble());
     }
 
-    /* CONTROL */
     @Override
     public void controlShoulder(Rotation2d position, double feedforwardVoltage) {
         shoulder.setControl(new MotionMagicVoltage(position.getRotations()).withFeedForward(feedforwardVoltage));

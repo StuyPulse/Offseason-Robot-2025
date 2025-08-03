@@ -27,6 +27,6 @@ public class ArmSetState extends Command {
 
     @Override
     public boolean isFinished() {
-        return arm.atTarget() && arm.getState() == state;
+        return arm.isArmAtTarget() && arm.getState() == state;
     }
 }

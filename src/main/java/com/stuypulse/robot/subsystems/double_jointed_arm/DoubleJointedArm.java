@@ -102,7 +102,7 @@ public class DoubleJointedArm extends SubsystemBase {
         Logger.recordOutput("DoubleJointedArm/CurrentState", state.name());
         Logger.recordOutput("DoubleJointedArm/ShoulderTarget", state.getShoulderTarget().getDegrees());
         Logger.recordOutput("DoubleJointedArm/ElbowTarget", state.getElbowTarget().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/AtTarget", isArmAtTarget(state.getElbowTarget(), state.getShoulderTarget()));
+        Logger.recordOutput("DoubleJointedArm/AtTarget", isArmAtTarget());
 
         double shoulderAngleRad = Math.toRadians(inputs.shoulderAngle);
         double elbowRelativeRad = Math.toRadians(inputs.elbowAngle - inputs.shoulderAngle);
@@ -119,7 +119,7 @@ public class DoubleJointedArm extends SubsystemBase {
         
         Matrix<N2, N1> ff = feedforwardVoltage(positions, velocities, accelerations);
         
-        if (intermediate && atTarget()) {
+        if (intermediate && isArmAtTarget()) {
             setState(storedState);
             intermediate = false;
         }
@@ -157,41 +157,25 @@ public class DoubleJointedArm extends SubsystemBase {
             .plus(new Transform2d(Constants.DoubleJointedArm.Elbow.LENGTH, 0.0, elbow.minus(Rotation2d.fromRadians(180.0 - shoulder.getRadians()))))
             .getTranslation();
     }
-    
-    @AutoLogOutput
-    public boolean atTarget() {
-        return isArmAtTarget(state.getShoulderTarget(), state.getElbowTarget());
-    }
 
     @AutoLogOutput
-    public boolean isShoulderAtTarget(Rotation2d shoulderTargetAngle) {
+    public boolean isShoulderAtTarget() {
         double currentAngle = inputs.shoulderAngle;
-        double targetAngle = shoulderTargetAngle.getDegrees();
+        double targetAngle = state.getShoulderTarget().getDegrees();
         return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Shoulder.ANGLE_TOLERANCE.getDegrees();
     }
 
     @AutoLogOutput
-    public boolean isElbowAtTarget(Rotation2d elbowTargetAngle) {
+    public boolean isElbowAtTarget() {
         double currentAngle = inputs.elbowAngle;
-        double targetAngle = elbowTargetAngle.getDegrees();
+        double targetAngle = state.getElbowTarget().getDegrees();
         return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Elbow.ANGLE_TOLERANCE.getDegrees();
     }
 
     @AutoLogOutput
-    public boolean isArmAtTarget(Rotation2d shoulderTargetAngle, Rotation2d elbowTargetAngle) {
-        return isShoulderAtTarget(shoulderTargetAngle) && isElbowAtTarget(elbowTargetAngle);
+    public boolean isArmAtTarget() {
+        return isShoulderAtTarget() && isElbowAtTarget();
     }
-
-    /* LOGIC for controlling the double jointed arm: */
-
-    // 1. Find M, C, G => calculate FF given gear ratio
-
-    // 2. Given a current position (x, y) for the end effector on the double jointed arm, pathfind to a target position (x, y) 
-    //    and calculate the required angular velocity and acceleration; clamp to motion profile limits
-
-    // 3. Use motion profile setpoints calculated in the last step + calculate PID and add to FF => yipee!
-
-    /* CONTROL LOGIC, STATES & MATH */
 
     private final Matrix<N2, N2> M = new Matrix<>(Nat.N2(), Nat.N2());
     private final Matrix<N2, N2> C = new Matrix<>(Nat.N2(), Nat.N2());
@@ -228,13 +212,13 @@ public class DoubleJointedArm extends SubsystemBase {
             DCMotor.getKrakenX60(1).withReduction(ELBOW_GEAR_RATIO).getVoltage(torque.get(1, 0), velocity.get(1, 0)));
     }
 
-    public Matrix<N2, N2> calcM(Matrix<N2, N1> position) { // only second joint position
+    public Matrix<N2, N2> calcM(Matrix<N2, N1> position) {
         M.set(
             0,
             0,
             m1 * Math.pow(r1, 2.0)
                 + m2 * (Math.pow(l1, 2.0) + Math.pow(r2, 2.0))
-                + I1 + I2
+                + I1 + I2 // here, I2 is not needed in virtual four bar double jointed arms because each joint is independently controlled
                 + 2
                     * m1
                     * m2
@@ -246,12 +230,14 @@ public class DoubleJointedArm extends SubsystemBase {
             1,
             0,
             m2 * Math.pow(r2, 2.0) + I2 + m2*l1*r2*Math.cos(position.get(1,0))
+            // I2 is not needed in above line if you have a virtual four bar, for same reasons as above
         );
 
         M.set(
             0,
             1,
             m2 * Math.pow(r2, 2.0) + I2 + m2*l1*r2*Math.cos(position.get(1,0))
+            // however, I2 is always needed for the second joint COM calculations
         );
 
         M.set(

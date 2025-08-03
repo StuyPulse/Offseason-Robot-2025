@@ -36,4 +36,9 @@ public interface Constants {
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(-70);
         }
     }
+
+    public interface Wrist {
+        double GEAR_RATIO = 1/1;
+        double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0).getRotations();
+    }
 }

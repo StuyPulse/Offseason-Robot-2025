@@ -20,4 +20,9 @@ public interface Ports {
         int ELBOW_ENCODER = 0;
         int PIGEON = 0;
     }
+
+    public interface Wrist {
+        int WRIST_MOTOR = 0;
+        int WRIST_ENCODER = 0;
+    }
 }
