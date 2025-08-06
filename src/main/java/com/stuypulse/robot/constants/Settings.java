@@ -16,15 +16,56 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public interface Settings {
     public interface DoubleJointedArm {
         public interface Shoulder {
-            Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
-        }
 
+            double DEFAULT = 0.0;
+            double L2 = 0.0;
+            double L3 = 0.0;
+            double L4 = 0.0;
+
+            public interface PID{
+                double kP = 0.0;
+                double kI = 0.0;
+                double kD = 0.0;
+            }
+            public interface FF{
+                double kS = 0.0;
+                double kG = 0.0;
+                double kV = 0.0;
+                double kA = 0.0;
+            }
+            double TOLERANCE = 0.1;
+            Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
+        }
+        
         public interface Elbow {
-            Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
-        }
-    }
 
+            double DEFAULT = 0.0;
+            double L2 = 0.0;
+            double L3 = 0.0;
+            double L4 = 0.0;
+            
+            public interface PID{
+                double kP = 0.0;
+                double kI = 0.0;
+                double kD = 0.0;
+            }
+            public interface FF{
+                double kS = 0.0;
+                double kG = 0.0;
+                double kV = 0.0;
+                double kA = 0.0;
+            }
+
+            double TOLERANCE = 0.1;
+
+            Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
+        }
+            
+
+    }
+    
     public interface Wrist {
         Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
     }
+
 }

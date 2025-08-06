@@ -18,36 +18,38 @@ public interface Constants {
         REPLAY
     }
     public interface DoubleJointedArm {
-        double BASE_HEIGHT = 0.2;
+        double BASE_HEIGHT = 0.2032; // 8 in -> 0.2032 m
+        
         public interface Shoulder {
-            double LENGTH = 1.0;
-            double MASS = 1.0;
+            double LENGTH = 0.9271; // 36.5 in -> 0.9779 m
+            double MASS = 0.51845608; // 1.143 lbs -> 0.51845608 kg
 
-            double MOTOR_GEAR_RATIO = 1.0 / 85.0;
+            double MOTOR_GEAR_RATIO = 3515.0 / 27.0; // Check
             double ENCODER_GEAR_RATIO = 4.625 / 1;
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
 
             double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-70);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(-70);
+            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-90);
+            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(90);
+
             
         }
 
         public interface Elbow {
-            double LENGTH = 1.0;
-            double MASS = 1.0;
+            double LENGTH = 0.519884533; // 20.467895 in -> 0.519884533 m
+            double MASS = 0.39780051; // 0.877 lbs -> 0.39780051 kg
 
-            double MOTOR_GEAR_RATIO = 1.0 / 85.0;
-            double ENCODER_GEAR_RATIO = 4.625 / 1;
+            double MOTOR_GEAR_RATIO = 3515.0 / 27.0;
+            double ENCODER_GEAR_RATIO = 3.0327 / 1; 
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
     
             double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-70);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(-70);
+            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);
+            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
         }
     }
 
