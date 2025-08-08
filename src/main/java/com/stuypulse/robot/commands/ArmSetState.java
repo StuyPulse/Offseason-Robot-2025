@@ -1,17 +1,17 @@
 package com.stuypulse.robot.commands;
 
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArm;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArm.ArmState;
+import com.stuypulse.robot.subsystems.arm.Arm;
+import com.stuypulse.robot.subsystems.arm.Arm.ArmState;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ArmSetState extends Command {
-    private DoubleJointedArm arm;
+    private Arm arm;
     private ArmState state;
 
     public ArmSetState(ArmState state) {
         this.state = state;
-        this.arm = DoubleJointedArm.getInstance();
+        this.arm = Arm.getInstance();
         addRequirements(arm);
     }
 

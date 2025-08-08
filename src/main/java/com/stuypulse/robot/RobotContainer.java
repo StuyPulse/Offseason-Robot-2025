@@ -8,11 +8,7 @@ package com.stuypulse.robot;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArm;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArmIO;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArmIOReal;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArmIOSim;
-import com.stuypulse.robot.subsystems.arm.DoubleJointedArmVisualizer;
+import com.stuypulse.robot.subsystems.arm.Arm;
 import com.stuypulse.robot.subsystems.wrist.Wrist;
 import com.stuypulse.robot.subsystems.wrist.WristIOReal;
 import com.stuypulse.stuylib.input.Gamepad;
@@ -29,7 +25,7 @@ public class RobotContainer {
     public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
     
     // Subsystem
-    private DoubleJointedArm dja;
+    private Arm dja;
     private Wrist wrist;
 
     // Autons
@@ -41,18 +37,18 @@ public class RobotContainer {
         switch (Constants.currentMode) {
             case REAL:
               // Real robot, instantiate hardware IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
+              dja = new Arm(new ArmImpl());
               wrist = new Wrist(new WristIOReal());
               break;
       
             case SIM:
               // Sim robot, instantiate physics sim IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIOSim());
+              dja = new Arm(new ArmSim());
               break;
       
             default:
               // Replayed robot, disable IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIO() {});
+              dja = new Arm(new Arm() {});
             //   drive = new Drive(new DriveIO() {}, new GyroIO() {});
             //   roller = new Roller(new RollerIO() {});
               break;

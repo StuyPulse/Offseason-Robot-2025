@@ -1,6 +1,8 @@
 package com.stuypulse.robot.subsystems.arm;
 
-public class ArmTrajectoryPoint {
+import edu.wpi.first.math.geometry.Translation2d;
+
+public class ArmTrajectoryPoint extends Translation2d {
     public double theta1;    // Shoulder angle (rad)
     public double theta2;    // Elbow angle (rad)
     public double omega1;    // Shoulder velocity (rad/s)
@@ -21,4 +23,6 @@ public class ArmTrajectoryPoint {
         this.alpha2 = alpha2;
         this.time = time;
     }
+
+    public ArmTrajectoryPoint() {}
 }

@@ -1,5 +1,6 @@
 package com.stuypulse.robot.subsystems.arm;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.*;
 
 import java.util.*;
@@ -16,8 +17,9 @@ public class ArmConfigurationSpace {
     private final double shoulderLength = Constants.DoubleJointedArm.Shoulder.LENGTH;
     private final double elbowLength = Constants.DoubleJointedArm.Elbow.LENGTH;
 
-    private final boolean[][] obstaclePoint; 
-    private final double gridResolution = 2.0 * Math.PI; // 2pi*2pi grid
+    private final boolean[][] obstaclePoint; // Cartesian (Should get rid of?)
+    private final List<Pair<Rotation2d, Rotation2d>> obstaclePoints; // Radians
+    private final double cartesianGrid = 100;
     
     // For visualization (Sim)
     private Translation2d currentEndEffectorPos;
@@ -25,7 +27,8 @@ public class ArmConfigurationSpace {
     private List<Translation2d> pathPoints = new ArrayList<>();
 
     public ArmConfigurationSpace() {
-        this.obstaclePoint = new boolean[(int)gridResolution][(int)gridResolution];
+        this.obstaclePoint = new boolean[(int)cartesianGrid][(int)cartesianGrid];
+        this.obstaclePoints = new ArrayList<>();
     }
 
     // Convert joint angles to Cartesian space
@@ -35,33 +38,81 @@ public class ArmConfigurationSpace {
         return new Translation2d(x, y);
     }
 
-    // Convert Cartesian to joint angles
-    // Generate two possible configurations?!?!? 
-    public Rotation2d[] toJointAngles(Translation2d point) {
-        double d = Math.sqrt(Math.pow(point.getX(), 2) + Math.pow(point.getY(), 2));
-        if (d > shoulderLength + elbowLength || d < Math.abs(shoulderLength - elbowLength)) {
+    // Convert Cartesian point to joint angles
+    public Pair<Pair<Rotation2d, Rotation2d>, Pair<Rotation2d, Rotation2d>> toJointAngles(Translation2d point) {
+        final double EPSILON = 1e-6; // Error
+        double x = point.getX();
+        double y = point.getY();
+        double dSquared = x * x + y * y;
+        double d = Math.sqrt(dSquared);
+    
+        // Check if point is reachable
+        if (d > shoulderLength + elbowLength + EPSILON || 
+            d + EPSILON < Math.abs(shoulderLength - elbowLength)) {
             return null; 
         }
-        
-        Rotation2d theta2 = new Rotation2d(Math.acos((Math.pow(point.getX(), 2) + Math.pow(point.getY(), 2) - shoulderLength*shoulderLength - elbowLength*elbowLength)
-                                / (2 * shoulderLength * elbowLength)));
-        Rotation2d theta1 = new Rotation2d(Math.atan2(point.getY(), point.getX()) - Math.atan2(elbowLength * Math.sin(theta2.getRadians()), 
-                                                    shoulderLength + elbowLength * Math.cos(theta2.getRadians())));
-        
-        return new Rotation2d[]{theta1, theta2};
+    
+        // Case 1: Fully stretched (only elbow-up solution exists)
+        if (Math.abs(d - (shoulderLength + elbowLength)) < EPSILON) {
+            double theta1 = Math.atan2(y, x);
+            double theta2 = 0.0; // Elbow completely straight
+            Pair<Rotation2d, Rotation2d> singleSolution = new Pair<>(
+                new Rotation2d(theta1),
+                new Rotation2d(theta2)
+            );
+            return new Pair<>(singleSolution, null);
+        }
+    
+        // Case 2: Fully folded (only elbow-down solution exists)
+        if (Math.abs(d - Math.abs(shoulderLength - elbowLength)) < EPSILON) {
+            double theta1 = Math.atan2(y, x);
+            double theta2 = Math.PI; // Elbow length less than shoulder length
+            Pair<Rotation2d, Rotation2d> singleSolution = new Pair<>(
+                new Rotation2d(theta1),
+                new Rotation2d(theta2)
+            );
+            return new Pair<>(singleSolution, null);
+        }
+    
+        // Normal case: Two solutions exist
+        double cosTheta2 = (dSquared - shoulderLength*shoulderLength - elbowLength*elbowLength) 
+                          / (2 * shoulderLength * elbowLength);
+        double theta2ElbowUp = Math.acos(cosTheta2);
+        double theta2ElbowDown = -theta2ElbowUp;
+    
+        double theta1ElbowUp = Math.atan2(y, x) - Math.atan2(
+            elbowLength * Math.sin(theta2ElbowUp),
+            shoulderLength + elbowLength * Math.cos(theta2ElbowUp)
+        );
+    
+        double theta1ElbowDown = Math.atan2(y, x) - Math.atan2(
+            elbowLength * Math.sin(theta2ElbowDown),
+            shoulderLength + elbowLength * Math.cos(theta2ElbowDown)
+        );
+    
+        Pair<Rotation2d, Rotation2d> elbowUpConfig = new Pair<>(
+            new Rotation2d(theta1ElbowUp),
+            new Rotation2d(theta2ElbowUp)
+        );
+    
+        Pair<Rotation2d, Rotation2d> elbowDownConfig = new Pair<>(
+            new Rotation2d(theta1ElbowDown),
+            new Rotation2d(theta2ElbowDown)
+        );
+    
+        return new Pair<>(elbowUpConfig, elbowDownConfig);
     }
 
     // Add obstacle in Cartesian space
     public void addObstacle(Translation2d point) {
-        Rotation2d[] angles = toJointAngles(point);
+        Pair<Pair<Rotation2d, Rotation2d>, Pair<Rotation2d, Rotation2d>> angles = toJointAngles(point);
 
         if (angles != null) {
-            int theta1Idx = (int)((angles[0].getRadians() - shoulderMinAngle.getRadians()) / (shoulderMaxAngle.getRadians() - shoulderMinAngle.getRadians()) * gridResolution);
-            int theta2Idx = (int)((angles[1].getRadians() - elbowMinAngle.getRadians()) / (elbowMaxAngle.getRadians() - elbowMinAngle.getRadians()) * gridResolution);
-            
-            if (theta1Idx >= 0 && theta1Idx < gridResolution && 
-                theta2Idx >= 0 && theta2Idx < gridResolution) {
-                obstaclePoint[theta1Idx][theta2Idx] = true;
+
+            obstaclePoint[(int)point.getX()][(int)point.getY()] = true;
+            obstaclePoints.add(angles.getFirst());
+            if (angles.getSecond() != null) {
+                obstaclePoints.add(angles.getSecond());
             }
         }
     }
@@ -75,13 +126,15 @@ public class ArmConfigurationSpace {
         }
         
         // Check obstacle grid
-        int theta1Idx = (int)((theta1.getRadians() - shoulderMinAngle.getRadians()) / (shoulderMaxAngle.getRadians() - shoulderMinAngle.getRadians()) * gridResolution);
-        int theta2Idx = (int)((theta2.getRadians() - elbowMinAngle.getRadians()) / (elbowMaxAngle.getRadians() - elbowMinAngle.getRadians()) * gridResolution);
-        
-        if (theta1Idx >= 0 && theta1Idx < gridResolution && 
-            theta2Idx >= 0 && theta2Idx < gridResolution) {
-            return !obstaclePoint[theta1Idx][theta2Idx];
+        Pair<Rotation2d, Rotation2d> point = new Pair<>(new Rotation2d(theta1.getRadians()), new Rotation2d(theta2.getRadians()));
+
+        for (int i = 0; i < obstaclePoints.size(); i++) {
+            if (point.equals(obstaclePoints.get(i))) {
+                return false;
+            }
         }
+
         return false;
+
     }
 }

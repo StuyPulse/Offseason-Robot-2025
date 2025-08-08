@@ -157,8 +157,8 @@ public class ArmImpl extends Arm {
 
         timer.reset();
 
-        aMatrix.set(0, 0, AStream.getSecond()); // Switch? 
-        aMatrix.set(1, 0, AStream.getFirst());
+        aMatrix.set(0, 0, AStream.getFirst()); 
+        aMatrix.set(1, 0, AStream.getSecond());
 
         return aMatrix;
     }
@@ -233,6 +233,7 @@ public class ArmImpl extends Arm {
                .plus(calculateGMatrix());
     }
 
+    // PID LOOPS??
     @Override
     public void setTargetAngles(Rotation2d shoulder, Rotation2d elbow) {
         Matrix<N2, N1> tau = calculateTorque();
@@ -263,9 +264,9 @@ public class ArmImpl extends Arm {
         }
         
         double theta2 = Math.acos((Math.pow(point.getX(), 2) + Math.pow(point.getY(), 2) - shoulderLength*shoulderLength - elbowLength*elbowLength) 
-                        / (2 * shoulderLength * elbowLength));
+                                    / (2 * shoulderLength * elbowLength));
         double theta1 = Math.atan2(point.getY(), point.getX()) - Math.atan2(elbowLength * Math.sin(theta2), 
-                                            shoulderLength + elbowLength * Math.cos(theta2));
+                                    shoulderLength + elbowLength * Math.cos(theta2));
         
         return new double[]{theta1, theta2};
     }

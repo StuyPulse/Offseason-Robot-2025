@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ArmPathPlanner {
     private final ArmConfigurationSpace configSpace;
-    private final double error = 0.1; // Radians
+    private final double EPSILON = 0.1; // Error in Radians
 
     // A* Node class
     private static class Node implements Comparable<Node> {
@@ -54,8 +54,8 @@ public class ArmPathPlanner {
                 for (int j = -1; j <= 1; j++) {
                     if (i == 0 && j == 0) continue;
 
-                    Rotation2d newTheta1 = new Rotation2d(current.theta1.getRadians() + i * error);
-                    Rotation2d newTheta2 = new Rotation2d(current.theta2.getRadians() + j * error);
+                    Rotation2d newTheta1 = new Rotation2d(current.theta1.getRadians() + i * EPSILON);
+                    Rotation2d newTheta2 = new Rotation2d(current.theta2.getRadians() + j * EPSILON);
                     String key = nodeKey(newTheta1, newTheta2);
 
                     if (!configSpace.isValidConfiguration(newTheta1, newTheta2)) continue;
@@ -114,8 +114,8 @@ public class ArmPathPlanner {
 
     // Helper Functions
     private boolean atGoal(Node node, Rotation2d goalTheta1, Rotation2d goalTheta2) {
-        return Math.abs(node.theta1.getRadians() - goalTheta1.getRadians()) < error &&
-               Math.abs(node.theta2.getRadians() - goalTheta2.getRadians()) < error;
+        return Math.abs(node.theta1.getRadians() - goalTheta1.getRadians()) < EPSILON &&
+               Math.abs(node.theta2.getRadians() - goalTheta2.getRadians()) < EPSILON;
     }
 
     private double distance(Node a, Node b) {
