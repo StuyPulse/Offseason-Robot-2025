@@ -8,6 +8,7 @@ public interface DoubleJointedArmIO {
     @AutoLog
     public class DoubleJointedArmIOInputs {
         public boolean shoulderMotorConnected = false;
+        public boolean shoulderFollowerMotorConnected = false;
         public boolean elbowMotorConnected = false;
 
         public double shoulderAngle = 0.0;
@@ -15,6 +16,12 @@ public interface DoubleJointedArmIO {
         public double shoulderAngularAccel = 0.0;
         public double shoulderAppliedVoltage = 0.0;
         public double shoulderCurrentAmps = 0.0;
+
+        public double shoulderFollowerAngle = 0.0;
+        public double shoulderFollowerAngularVel = 0.0;
+        public double shoulderFollowerAngularAccel = 0.0;
+        public double shoulderFollowerAppliedVoltage = 0.0;
+        public double shoulderFollowerCurrentAmps = 0.0;
 
         public double elbowAngle = 0.0;
         public double elbowAngularAccel = 0.0;

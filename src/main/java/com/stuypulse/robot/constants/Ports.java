@@ -15,6 +15,7 @@ public interface Ports {
 
     public interface DoubleJointedArm {
         int SHOULDER_MOTOR = 0;
+        int SHOULDER_FOLLOWER = 0;
         int SHOULDER_ENCODER = 0;
         int ELBOW_MOTOR = 0;
         int ELBOW_ENCODER = 0;

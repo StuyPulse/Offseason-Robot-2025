@@ -49,6 +49,18 @@ public interface Devices {
                 .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
                 .withMotionProfile(0, 0);
 
+            TalonFXConfig motor_followerConfig = new TalonFXConfig()
+                .withCurrentLimitAmps(80)
+                    .withRampRate(0.25)
+                    .withNeutralMode(NeutralModeValue.Brake)
+                    .withInvertedValue(InvertedValue.Clockwise_Positive)
+                    .withPIDConstants(0, 0, 0, 0)
+                    .withFFConstants(0, 0, 0, 0)
+                    .withGravityType(GravityTypeValue.Arm_Cosine)
+                    .withSensorToMechanismRatio(0)
+                    .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
+                    .withMotionProfile(0, 0);
+
             CANcoderConfiguration cc_config = new CANcoderConfiguration()
             .withMagnetSensor(
                 new MagnetSensorConfigs()
