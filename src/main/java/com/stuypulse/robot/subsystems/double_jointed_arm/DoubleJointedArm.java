@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DoubleJointedArm extends SubsystemBase {
@@ -22,7 +24,7 @@ public class DoubleJointedArm extends SubsystemBase {
     
     public static DoubleJointedArm getInstance() {
         if (instance == null) {
-            instance = new DoubleJointedArm(Robot.isReal() ? new DoubleJointedArmIOReal() : new DoubleJointedArmIOReal()); // will fix once sim is finished
+            instance = new DoubleJointedArm(Robot.isReal() ? new DoubleJointedArmIOReal() : new DoubleJointedArmIOSim());
         }
         return instance;
     }
@@ -34,24 +36,30 @@ public class DoubleJointedArm extends SubsystemBase {
     private ArmState storedState;
     private boolean intermediate;
 
+    private DoubleJointedArmVisualizer visualizerMeasured;
+    private DoubleJointedArmVisualizer visualizerSetpoint;
+
     public DoubleJointedArm(DoubleJointedArmIO io) {
         this.io = io;
         state = ArmState.STOW;
         storedState = ArmState.STOW;
         intermediate = false;
+
+        visualizerMeasured = new DoubleJointedArmVisualizer("ArmMeasured", null);
+        visualizerSetpoint = new DoubleJointedArmVisualizer("ArmSetpoint", new Color8Bit(Color.kOrange));
     }
 
     public enum ArmState {
-        STOW(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        INT(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)),
-        L4_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L4_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L3_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L3_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L2_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L2_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L1_FRONT(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10)),
-        L1_BACK(Rotation2d.fromDegrees(10), Rotation2d.fromDegrees(10));
+        STOW(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(0)),
+        INT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
+        L4_FRONT(Rotation2d.fromDegrees(30), Rotation2d.fromDegrees(60)),
+        L4_BACK(Rotation2d.fromDegrees(150), Rotation2d.fromDegrees(-60)),
+        L3_FRONT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
+        L3_BACK(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-45)),
+        L2_FRONT(Rotation2d.fromDegrees(60), Rotation2d.fromDegrees(30)),
+        L2_BACK(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-30)),
+        L1_FRONT(Rotation2d.fromDegrees(75), Rotation2d.fromDegrees(15)),
+        L1_BACK(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-15));
 
         private ArmState(Rotation2d shoulderAngle, Rotation2d elbowAngle){
             this.shoulderAngle = shoulderAngle;
@@ -97,21 +105,15 @@ public class DoubleJointedArm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("DoubleJointedArm", inputs);
-        Logger.recordOutput("DoubleJointedArm/CurrentState", state.name());
-        Logger.recordOutput("DoubleJointedArm/ShoulderTarget", state.getShoulderTarget().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/ElbowTarget", state.getElbowTarget().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/AtTarget", isArmAtTarget());
 
-        double shoulderAngleRad = Math.toRadians(inputs.shoulderAngle);
-        double elbowRelativeRad = Math.toRadians(inputs.elbowAngle - inputs.shoulderAngle);
+        double shoulderAngleRad = inputs.shoulderAngle;
+        double elbowRelativeRad = inputs.elbowAngle;
 
-        double shoulderVelRad = Math.toRadians(inputs.shoulderAngularVel);
-        double elbowRelativeVelRad = Math.toRadians(inputs.elbowAngularVel - inputs.shoulderAngularVel);
+        double shoulderVelRad = inputs.shoulderAngularVel;
+        double elbowRelativeVelRad = inputs.elbowAngularVel;
 
-        double shoulderAccelRad = Math.toRadians(inputs.shoulderAngularAccel);
-        double elbowRelativeAccelRad = Math.toRadians(inputs.elbowAngularAccel - inputs.shoulderAngularAccel);
+        double shoulderAccelRad = inputs.shoulderAngularAccel;
+        double elbowRelativeAccelRad = inputs.elbowAngularAccel;
 
         Matrix<N2, N1> positions = VecBuilder.fill(shoulderAngleRad, elbowRelativeRad);
         Matrix<N2, N1> velocities = VecBuilder.fill(shoulderVelRad, elbowRelativeVelRad);
@@ -126,6 +128,16 @@ public class DoubleJointedArm extends SubsystemBase {
 
         io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
         io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
+
+        visualizerMeasured.update(shoulderAngleRad, elbowRelativeRad);
+        visualizerSetpoint.update(state.getShoulderTarget().getRadians(), state.getElbowTarget().getRadians());
+
+        io.updateInputs(inputs);
+        Logger.processInputs("DoubleJointedArm/", inputs);
+        Logger.recordOutput("DoubleJointedArm/Arm/State", state.name());
+        Logger.recordOutput("DoubleJointedArm/Joints/Shoulder/TargetDeg", state.getShoulderTarget().getDegrees());
+        Logger.recordOutput("DoubleJointedArm/Joints/Elbow/TargetDeg", state.getElbowTarget().getDegrees());
+        Logger.recordOutput("DoubleJointedArm/Arm/AtTarget", isArmAtTarget());
     }
 
     /* GETTERS */
@@ -135,20 +147,31 @@ public class DoubleJointedArm extends SubsystemBase {
         return state;
     }
     
-    @AutoLogOutput
-    public Rotation2d getCurrentShoulderAngle() {
-        return Rotation2d.fromDegrees(inputs.shoulderAngle);
+
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleRad")
+    public Rotation2d getShoulderAngleRad() {
+        return Rotation2d.fromRadians(inputs.shoulderAngle);
+    }
+
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleDeg")
+    public double getShoulderAngleDeg() {
+        return Rotation2d.fromRadians(inputs.shoulderAngle).getDegrees();
     }
     
-    @AutoLogOutput
-    public Rotation2d getCurrentElbowAngle() {
-        return Rotation2d.fromDegrees(inputs.elbowAngle);
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleRad")
+    public Rotation2d getElbowAngleRad() {
+        return Rotation2d.fromRadians(inputs.elbowAngle);
     }
     
-    @AutoLogOutput
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleDeg")
+    public double getElbowAngleDeg() {
+        return Rotation2d.fromRadians(inputs.elbowAngle).getDegrees();
+    }
+    
+    @AutoLogOutput (key = "DoubleJointedArm/Arm/EndPosition")
     public Translation2d getEndPosition() { // Forward Kinematics
-        Rotation2d shoulder = getCurrentShoulderAngle();
-        Rotation2d elbow = getCurrentElbowAngle();
+        Rotation2d shoulder = getShoulderAngleRad();
+        Rotation2d elbow = getElbowAngleRad();
 
         Transform2d startPoint = new Transform2d(0.0, Constants.DoubleJointedArm.BASE_HEIGHT, new Rotation2d());
 
@@ -158,21 +181,21 @@ public class DoubleJointedArm extends SubsystemBase {
             .getTranslation();
     }
 
-    @AutoLogOutput
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AtTarget")
     public boolean isShoulderAtTarget() {
         double currentAngle = inputs.shoulderAngle;
-        double targetAngle = state.getShoulderTarget().getDegrees();
-        return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Shoulder.ANGLE_TOLERANCE.getDegrees();
+        double targetAngle = state.getShoulderTarget().getRadians();
+        return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Shoulder.ANGLE_TOLERANCE.getRadians();
     }
 
-    @AutoLogOutput
+    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AtTarget")
     public boolean isElbowAtTarget() {
         double currentAngle = inputs.elbowAngle;
-        double targetAngle = state.getElbowTarget().getDegrees();
-        return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Elbow.ANGLE_TOLERANCE.getDegrees();
+        double targetAngle = state.getElbowTarget().getRadians();
+        return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Elbow.ANGLE_TOLERANCE.getRadians();
     }
 
-    @AutoLogOutput
+    @AutoLogOutput (key = "DoubleJointedArm/Arm/AtTarget")
     public boolean isArmAtTarget() {
         return isShoulderAtTarget() && isElbowAtTarget();
     }
@@ -184,11 +207,11 @@ public class DoubleJointedArm extends SubsystemBase {
     private final double m1 = Constants.DoubleJointedArm.Shoulder.MASS;   
     private final double m2 = Constants.DoubleJointedArm.Elbow.MASS;          
     private final double l1 = Constants.DoubleJointedArm.Shoulder.LENGTH;  
-    private final double l2 = Constants.DoubleJointedArm.Elbow.LENGTH; // we never go this far
+    private final double l2 = Constants.DoubleJointedArm.Elbow.LENGTH;
     private final double r1 = Constants.DoubleJointedArm.Shoulder.LENGTH/2; 
-    private final double r2 = Constants.DoubleJointedArm.Elbow.LENGTH/2; // assuming relatively uniform mass distribution
+    private final double r2 = Constants.DoubleJointedArm.Elbow.LENGTH/2;
     private final double I1 = Constants.DoubleJointedArm.Elbow.LENGTH/2;
-    private final double I2 = Constants.DoubleJointedArm.Elbow.LENGTH/2; // idfk how to find this
+    private final double I2 = Constants.DoubleJointedArm.Elbow.LENGTH/2;
     
     private final double GRAVITY = 9.81; // m/s²
 
@@ -197,8 +220,8 @@ public class DoubleJointedArm extends SubsystemBase {
 
     /*
      * @param position The angles of the joints, (θ1, θ2). Note that θ2 is relative to the first joint, not the horizontal
-     * @param velocity The velocities of the joints in deg/s
-     * @param acceleration The accelerations of the joints in deg/s^2
+     * @param velocity The velocities of the joints in rad/s
+     * @param acceleration The accelerations of the joints in rad/s^2
      */
     public Matrix<N2, N1> feedforwardVoltage(Matrix<N2, N1> position, Matrix<N2, N1> velocity, Matrix<N2, N1> acceleration) {
         Matrix<N2, N1> torque = 
@@ -218,26 +241,20 @@ public class DoubleJointedArm extends SubsystemBase {
             0,
             m1 * Math.pow(r1, 2.0)
                 + m2 * (Math.pow(l1, 2.0) + Math.pow(r2, 2.0))
-                + I1 + I2 // here, I2 is not needed in virtual four bar double jointed arms because each joint is independently controlled
-                + 2
-                    * m1
-                    * m2
-                    * r2
-                    * Math.cos(position.get(1, 0))
+                + I1 + I2
+                + 2 * m2 * l1 * r2 * Math.cos(position.get(1, 0))
         );
 
         M.set(
             1,
             0,
             m2 * Math.pow(r2, 2.0) + I2 + m2*l1*r2*Math.cos(position.get(1,0))
-            // I2 is not needed in above line if you have a virtual four bar, for same reasons as above
         );
 
         M.set(
             0,
             1,
             m2 * Math.pow(r2, 2.0) + I2 + m2*l1*r2*Math.cos(position.get(1,0))
-            // however, I2 is always needed for the second joint COM calculations
         );
 
         M.set(
@@ -253,27 +270,16 @@ public class DoubleJointedArm extends SubsystemBase {
         C.set(
             0,
             0,
-            -m2
-                * l1
-                * r2
-                * Math.sin(position.get(1, 0))
-                * velocity.get(1, 0));
+            -m2 * l1 * r2 * Math.sin(position.get(1, 0)) * velocity.get(1, 0));
         C.set(
             1,
             0,
-            m2
-                * l1
-                * r2
-                * Math.sin(position.get(1, 0))
-                * velocity.get(0, 0));
+            m2 * l1 * r2 * Math.sin(position.get(1, 0)) * velocity.get(0, 0));
         C.set(
             0,
             1,
-            -m1
-                * l1
-                * r2
-                * Math.sin(position.get(1, 0))
-                * (velocity.get(0, 0) + velocity.get(1, 0)));
+            -m2 * l1 * r2 * Math.sin(position.get(1, 0)) * (velocity.get(0, 0) + velocity.get(1, 0)));
+        C.set(1, 1, 0.0);
         return C;
     }
 
@@ -281,13 +287,8 @@ public class DoubleJointedArm extends SubsystemBase {
         Tg.set(
             0,
             0,
-            (m1 * r2 + m2 * l1)
-                    * GRAVITY
-                    * Math.cos(position.get(0, 0))
-                + m2
-                    * r2
-                    * GRAVITY
-                    * Math.cos(position.get(0, 0) + position.get(1, 0)));
+            (m1 * r1 + m2 * l1) * GRAVITY * Math.cos(position.get(0, 0))
+                + m2 * r2 * GRAVITY * Math.cos(position.get(0, 0) + position.get(1, 0)));
         Tg.set(
             1,
             0,

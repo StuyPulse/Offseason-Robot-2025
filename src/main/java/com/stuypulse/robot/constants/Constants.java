@@ -18,7 +18,7 @@ public interface Constants {
         REPLAY
     }
     public interface DoubleJointedArm {
-        double BASE_HEIGHT = 0.2;
+        double BASE_HEIGHT = 1;
         public interface Shoulder {
             double LENGTH = 1.0;
             double MASS = 1.0;
@@ -30,8 +30,8 @@ public interface Constants {
             double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-70);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(-70);
+            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-100);
+            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
             
         }
 
@@ -46,8 +46,8 @@ public interface Constants {
             double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-70);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(-70);
+            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-100);
+            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
         }
     }
 

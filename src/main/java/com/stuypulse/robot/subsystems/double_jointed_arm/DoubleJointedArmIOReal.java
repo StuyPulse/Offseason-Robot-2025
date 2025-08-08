@@ -3,6 +3,7 @@ package com.stuypulse.robot.subsystems.double_jointed_arm;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.stuypulse.robot.constants.Devices;
@@ -90,18 +91,18 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         );
 
         inputs.shoulderMotorConnected = shoulder.isConnected();
-        inputs.shoulderAngle = shoulder.getPosition().getValueAsDouble() * 360;
-        inputs.shoulderAngularVel = shoulder.getVelocity().getValueAsDouble() * 360;
-        inputs.shoulderAngularAccel = shoulder.getAcceleration().getValueAsDouble() * 360;
-        inputs.shoulderAppliedVoltage = shoulder.getMotorVoltage().getValueAsDouble();
-        inputs.shoulderCurrentAmps = shoulder.getTorqueCurrent().getValueAsDouble();
+        inputs.shoulderAngle = shoulderAngle.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.shoulderAngularVel = shoulderAngularVel.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.shoulderAngularAccel = shoulderAngularAccel.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.shoulderAppliedVoltage = shoulderAppliedVoltage.getValueAsDouble();
+        inputs.shoulderCurrentAmps = shoulderCurrentAmps.getValueAsDouble();
 
         inputs.elbowMotorConnected = elbow.isConnected();
-        inputs.elbowAngle = elbow.getPosition().getValueAsDouble() * 360;
-        inputs.elbowAngularVel = elbow.getVelocity().getValueAsDouble() * 360;
-        inputs.elbowAngularAccel = elbow.getAcceleration().getValueAsDouble() * 360;
-        inputs.elbowAppliedVoltage = elbow.getMotorVoltage().getValueAsDouble();
-        inputs.elbowCurrentAmps = elbow.getTorqueCurrent().getValueAsDouble();
+        inputs.elbowAngle = elbowAngle.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.elbowAngularVel = elbowAngularVel.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.elbowAngularAccel = elbowAngularAccel.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.elbowAppliedVoltage = elbowAppliedVoltage.getValueAsDouble();
+        inputs.elbowCurrentAmps = elbowCurrentAmps.getValueAsDouble();
     }
 
     public Rotation2d getShoulderAngle() {
@@ -120,5 +121,15 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
     @Override
     public void controlElbow(Rotation2d position, double feedforwardVoltage) {
         elbow.setControl(new MotionMagicVoltage(position.getRotations()).withFeedForward(feedforwardVoltage));
+    }
+
+    @Override
+    public void runVoltageShoulder(double voltage) {
+        shoulder.setControl(new VoltageOut(voltage));
+    }
+
+    @Override
+    public void runVoltageElbow(double voltage) {
+        elbow.setControl(new VoltageOut(voltage));
     }
 }

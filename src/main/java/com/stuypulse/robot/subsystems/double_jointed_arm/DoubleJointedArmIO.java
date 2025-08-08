@@ -24,10 +24,12 @@ public interface DoubleJointedArmIO {
     }
 
     /* Updates logged data */
-    public abstract void updateInputs(DoubleJointedArmIOInputs inputs);
+    public default void updateInputs(DoubleJointedArmIOInputs inputs) {};
 
     /* Control functions */
-    public abstract void controlShoulder(Rotation2d position, double feedforwardVoltage);
-    public abstract void controlElbow(Rotation2d position, double feedforwardVoltage);
+    public default void controlShoulder(Rotation2d position, double feedforwardVoltage) {};
+    public default void controlElbow(Rotation2d position, double feedforwardVoltage) {};
+    public default void runVoltageShoulder(double volts) {};
+    public default void runVoltageElbow(double volts) {};
 
 }
