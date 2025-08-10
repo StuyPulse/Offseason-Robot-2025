@@ -1,4 +1,4 @@
-package com.stuypulse.robot.subsystems.arm;
+package com.stuypulse.robot.subsystems.double_jointed_arm;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.*;

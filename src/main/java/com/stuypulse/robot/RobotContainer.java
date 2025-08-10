@@ -8,7 +8,7 @@ package com.stuypulse.robot;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
-import com.stuypulse.robot.subsystems.arm.Arm;
+import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.wrist.Wrist;
 import com.stuypulse.robot.subsystems.wrist.WristIOReal;
 import com.stuypulse.stuylib.input.Gamepad;

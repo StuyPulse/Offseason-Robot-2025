@@ -1,7 +1,7 @@
 package com.stuypulse.robot.commands;
 
-import com.stuypulse.robot.subsystems.arm.Arm;
-import com.stuypulse.robot.subsystems.arm.Arm.ArmState;
+import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
+import com.stuypulse.robot.subsystems.double_jointed_arm.Arm.ArmState;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

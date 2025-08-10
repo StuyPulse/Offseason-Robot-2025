@@ -33,7 +33,9 @@ public interface Settings {
                 double kV = 0.0;
                 double kA = 0.0;
             }
+
             double TOLERANCE = 0.1;
+            
             Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
         }
         
