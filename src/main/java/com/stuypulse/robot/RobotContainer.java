@@ -12,7 +12,7 @@ import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIO;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOReal;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOSim;
-import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmVisualizer;
+import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
 import com.stuypulse.robot.subsystems.wrist.Wrist;
 import com.stuypulse.robot.subsystems.wrist.WristIOReal;
 import com.stuypulse.stuylib.input.Gamepad;
@@ -31,6 +31,7 @@ public class RobotContainer {
     // Subsystem
     private DoubleJointedArm dja;
     private Wrist wrist;
+    private SwerveDrive swerve;
 
     // Autons
     private static SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -43,6 +44,7 @@ public class RobotContainer {
               // Real robot, instantiate hardware IO implementations
               dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
               wrist = new Wrist(new WristIOReal());
+              swerve = SwerveDrive.getInstance();
               break;
       
             case SIM:

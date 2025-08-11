@@ -5,25 +5,24 @@
 
 package com.stuypulse.robot;
 
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.rlog.RLOGServer;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.stuypulse.robot.constants.Constants;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends LoggedRobot {
 
+    private static Alliance alliance;
+
     private RobotContainer robot;
     private Command auto;
-
-    
 
     public Robot() {
         Logger.recordMetadata("OFFSEASON_ROBOT_25", "ROBOT_PROJECT"); // Set a metadata value
@@ -53,7 +52,13 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         robot = new RobotContainer();
+        alliance = Alliance.Blue;
     }
+
+    public static boolean isBlue() {
+        return alliance == Alliance.Blue;
+    }
+    
     /*************************/
     /*** ROBOT SCHEDULEING ***/
     /*************************/
@@ -66,6 +71,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        if (DriverStation.getAlliance().isPresent()) {
+            alliance = DriverStation.getAlliance().get();
+        }
     }
 
     /*********************/
