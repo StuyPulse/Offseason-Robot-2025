@@ -17,11 +17,13 @@ public abstract class Arm extends SubsystemBase{
     public static final Arm instance;
 
     static {
-        if (Robot.isReal()){
-            instance = new ArmImpl();
-        } else {
-            instance = new ArmSim();
-        }
+        instance = new ArmImpl();
+        //XXX - Sim removed for testing
+        // if (Robot.isReal()){
+        //     instance = new ArmImpl();
+        // } else {
+        //     instance = new ArmSim();
+        // }
     }
 
     public static Arm getInstance(){

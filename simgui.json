@@ -1,0 +1,49 @@
+{
+  "NTProvider": {
+    "types": {
+      "/AdvantageKit/RealOutputs/DoubleJointedArm/VisualizerMechanism2d/ArmMeasured": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/DoubleJointedArm/VisualizerMechanism2d/ArmSetpoint": "Mechanism2d",
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Autonomous": "String Chooser"
+    },
+    "windows": {
+      "/AdvantageKit/RealOutputs/DoubleJointedArm/VisualizerMechanism2d/ArmMeasured": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/AdvantageKit/RealOutputs/DoubleJointedArm/VisualizerMechanism2d/ArmSetpoint": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Autonomous": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "AdvantageKit": {
+        "DoubleJointedArm": {
+          "open": true
+        },
+        "open": true
+      },
+      "FMSInfo": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "Autonomous": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}

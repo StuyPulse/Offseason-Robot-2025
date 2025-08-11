@@ -2,6 +2,7 @@ package com.stuypulse.robot.subsystems.double_jointed_arm;
 
 import java.util.List;
 
+import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -10,8 +11,6 @@ import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Settings;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -52,6 +51,9 @@ public class DoubleJointedArm extends SubsystemBase {
 
         visualizerMeasured = new DoubleJointedArmVisualizer("ArmMeasured", null);
         visualizerSetpoint = new DoubleJointedArmVisualizer("ArmSetpoint", new Color8Bit(Color.kOrange));
+
+        configSpace = new ArmConfigurationSpace();
+        pathPlanner = new ArmPathPlanner(configSpace);
     }
 
     public enum ArmState {
@@ -114,7 +116,6 @@ public class DoubleJointedArm extends SubsystemBase {
     public ArmState getState() {
         return state;
     }
-    
 
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleRad")
     public Rotation2d getShoulderAngleRad() {
@@ -168,13 +169,12 @@ public class DoubleJointedArm extends SubsystemBase {
         return isShoulderAtTarget() && isElbowAtTarget();
     }
 
-    // Matricies
-    private Matrix<N2, N2> mMatrix;
-    private Matrix<N2, N2> cMatrix;
-    private Matrix<N2, N1> gMatrix;
-
-    private Matrix<N2, N1> vMatrix;
-    private Matrix<N2, N1> aMatrix;
+    // Matricies XXX - I don't know if this is how you properly initialize them but they were giving runtime errors before i did ts
+    private Matrix<N2, N2> mMatrix = new Matrix<N2, N2>(new SimpleMatrix(2, 2));
+    private Matrix<N2, N2> cMatrix = new Matrix<N2, N2>(new SimpleMatrix(2, 2));
+    private Matrix<N2, N1> gMatrix = new Matrix<N2, N1>(new SimpleMatrix(2, 2));
+    private Matrix<N2, N1> vMatrix = new Matrix<N2, N1>(new SimpleMatrix(2, 2));
+    private Matrix<N2, N1> aMatrix = new Matrix<N2, N1>(new SimpleMatrix(2, 2));
 
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;
