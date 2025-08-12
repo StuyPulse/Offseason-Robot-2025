@@ -16,6 +16,6 @@ public interface WristIO {
         public double wristCurrentAmps = 0.0;
     }
 
-    public abstract void updateInputs(WristIOInputs inputs);
-    public abstract void controlWrist(Rotation2d position);
+    public default void updateInputs(WristIOInputs inputs) {};
+    public default void controlWrist(Rotation2d position) {};
 }

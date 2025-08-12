@@ -12,6 +12,8 @@ import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIO;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOReal;
 import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOSim;
+import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmVisualizer;
+import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
 import com.stuypulse.robot.subsystems.wrist.Wrist;
 import com.stuypulse.robot.subsystems.wrist.WristIOReal;
 import com.stuypulse.stuylib.input.Gamepad;
@@ -23,45 +25,46 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class RobotContainer {
 
-	// Gamepads
-	public final Gamepad driver = new AutoGamepad(Ports.Gamepad.DRIVER);
-	public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
-
-	// Subsystem
-	private DoubleJointedArm dja;
-	private Wrist wrist;
+    // Gamepads
+    public final Gamepad driver = new AutoGamepad(Ports.Gamepad.DRIVER);
+    public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
+    
+    // Subsystem
+    private DoubleJointedArm dja;
+    private Wrist wrist;
+	private SwerveDrive swerve;
 
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
 	// Robot container
 
-	public RobotContainer() {
-		switch (Constants.currentMode) {
-			case REAL:
-				// Real robot, instantiate hardware IO implementations
-				dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
-				wrist = new Wrist(new WristIOReal());
-				break;
-
-			case SIM:
-				// Sim robot, instantiate physics sim IO implementations
-				dja = new DoubleJointedArm(new DoubleJointedArmIOSim());
-				break;
-
-			default:
-				// Replayed robot, disable IO implementations
-				dja = new DoubleJointedArm(new DoubleJointedArmIO(){}); // TODO: MAKE SURE THIS IS THE RIGHT PARAMETER FOR THE CONSTRUCTOR
-				// drive = new Drive(new DriveIO() {}, new GyroIO() {});
-				// roller = new Roller(new RollerIO() {});
-				break;
-		}
-
-		configureDefaultCommands();
-		configureButtonBindings();
-		configureAutons();
-
-	}
+    public RobotContainer() {
+        switch (Constants.currentMode) {
+            case REAL:
+              // Real robot, instantiate hardware IO implementations
+              dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
+              wrist = new Wrist(new WristIOReal());
+			  swerve = SwerveDrive.getInstance();
+              break;
+      
+            case SIM:
+              // Sim robot, instantiate physics sim IO implementations
+              dja = new DoubleJointedArm(new DoubleJointedArmIOSim());
+              break;
+      
+            default:
+              // Replayed robot, disable IO implementations
+              dja = new DoubleJointedArm(new DoubleJointedArmIO() {});
+            //   drive = new Drive(new DriveIO() {}, new GyroIO() {});
+            //   roller = new Roller(new RollerIO() {});
+              break;
+        }
+        
+        configureDefaultCommands();
+        configureButtonBindings();
+        configureAutons();
+    }
 
 	/****************/
 	/*** DEFAULTS ***/

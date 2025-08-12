@@ -1,11 +1,9 @@
-/************************ PROJECT PHIL ************************/
-/* Copyright (c) 2024 StuyPulse Robotics. All rights reserved.*/
-/* This work is licensed under the terms of the MIT license.  */
-/**************************************************************/
-
 package com.stuypulse.robot.constants;
 
+import com.stuypulse.stuylib.network.SmartNumber;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 /*-
  * File containing tunable settings for every subsystem on the robot.
@@ -14,6 +12,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * values that we can edit on Shuffleboard.
  */
 public interface Settings {
+    
+    double DT = 0.02;
+    String CANIVORE = "CANIVORE";
+    double TARGET_DISTANCE_FROM_REEF = 0;
     public interface DoubleJointedArm {
         public interface Shoulder {
 
@@ -70,4 +72,15 @@ public interface Settings {
         Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
     }
 
+    public interface Swerve {
+        double MAX_MODULE_SPEED = 3.0;
+        double MAX_MODULE_ACCEL = 4.0;
+        double MODULE_VELOCITY_DEADBAND = 0.05;
+
+        SmartNumber MAX_VELOCITY = new SmartNumber("Swerve/Motion/Max Velocity (m per s)", 2.5);
+        SmartNumber MAX_ACCELERATION = new SmartNumber("Swerve/Motion/Max Acceleration (m per s^2)", 3.0);
+        SmartNumber MAX_ANGULAR_VELOCITY = new SmartNumber("Swerve/Motion/Max Angular Velocity (rad per s)", Units.degreesToRadians(360));
+        SmartNumber MAX_ANGULAR_ACCELERATION = new SmartNumber("Swerve/Motion/Max Angular Acceleration (rad per s^2)", Units.degreesToRadians(720));
+
+    }
 }
