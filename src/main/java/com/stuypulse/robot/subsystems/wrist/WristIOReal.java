@@ -27,10 +27,10 @@ public class WristIOReal implements WristIO {
 
     public WristIOReal() {
         super();
-        wrist = new TalonFX(Ports.Wrist.WRIST_MOTOR);
+        wrist = new TalonFX(Ports.Wrist.WRIST_MOTOR, "CANIVORE");
         Devices.Wrist.motor_config.configure(wrist);
 
-        encoder = new CANcoder(Ports.Wrist.WRIST_ENCODER);
+        encoder = new CANcoder(Ports.Wrist.WRIST_ENCODER, "CANIVORE");
         encoder.getConfigurator().apply(Devices.Wrist.cc_config);
 
         wrist.setPosition(encoder.getAbsolutePosition().getValueAsDouble()); // zero position

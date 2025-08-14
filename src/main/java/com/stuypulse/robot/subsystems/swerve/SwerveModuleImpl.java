@@ -39,7 +39,7 @@ public class SwerveModuleImpl extends SwerveModule {
 
         pivotMotor = new SparkMax(pivotMotorID, MotorType.kBrushless);
         pivotMotor.configure(Devices.Swerve.Turn.motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        pivotEncoder = new CANcoder(pivotEncoderID, "rio");
+        pivotEncoder = new CANcoder(pivotEncoderID, "CANIVORE");
 
         pivotController = new AnglePIDController(Gains.Swerve.Turn.kP, Gains.Swerve.Turn.kI, Gains.Swerve.Turn.kD);
     }

@@ -47,12 +47,12 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
 
     public DoubleJointedArmIOReal() {
         super();
-        shoulder = new TalonFX(Ports.DoubleJointedArm.SHOULDER_MOTOR);
-        shoulderEncoder = new CANcoder(Ports.DoubleJointedArm.SHOULDER_ENCODER);
-        shoulderFollower = new TalonFX(Ports.DoubleJointedArm.SHOULDER_FOLLOWER);
+        shoulder = new TalonFX(Ports.DoubleJointedArm.SHOULDER_MOTOR, "CANIVORE");
+        shoulderEncoder = new CANcoder(Ports.DoubleJointedArm.SHOULDER_ENCODER, "CANIVORE");
+        shoulderFollower = new TalonFX(Ports.DoubleJointedArm.SHOULDER_FOLLOWER, "CANIVORE");
 
-        elbow = new TalonFX(Ports.DoubleJointedArm.ELBOW_MOTOR);
-        elbowEncoder = new CANcoder(Ports.DoubleJointedArm.ELBOW_ENCODER);
+        elbow = new TalonFX(Ports.DoubleJointedArm.ELBOW_MOTOR, "CANIVORE");
+        elbowEncoder = new CANcoder(Ports.DoubleJointedArm.ELBOW_ENCODER, "CANIVORE");
 
         // Configs
         Devices.DoubleJointedArm.Shoulder.motor_config.configure(shoulder);
