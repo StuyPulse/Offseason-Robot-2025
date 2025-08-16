@@ -34,20 +34,12 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
     private final TalonFX elbowMotor;
     private final CoreCANcoder elbowEncoder;
 
-    private final Timer timer;
-
     // Status Signals (refreshed periodically upon initialization)
     private final StatusSignal<Angle> shoulderAngle;
     private final StatusSignal<AngularVelocity> shoulderAngularVel;
     private final StatusSignal<AngularAcceleration> shoulderAngularAccel;
     private final StatusSignal<Voltage> shoulderAppliedVoltage;
     private final StatusSignal<Current> shoulderCurrentAmps;
-
-    private final StatusSignal<Angle> shoulderFollowerAngle;
-    private final StatusSignal<AngularVelocity> shoulderFollowerAngularVel;
-    private final StatusSignal<AngularAcceleration> shoulderFollowerAngularAccel;
-    private final StatusSignal<Voltage> shoulderFollowerAppliedVoltage;
-    private final StatusSignal<Current> shoulderFollowerCurrentAmps;
 
     private final StatusSignal<Angle> shoulderFollowerAngle;
     private final StatusSignal<AngularVelocity> shoulderFollowerAngularVel;
@@ -71,8 +63,6 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
 
         shoulderEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Shoulder.ENCODER);
         elbowEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Elbow.ENCODER);
-
-        timer = new Timer();
         
         // Configs
         Devices.DoubleJointedArm.Shoulder.motor_config.configure(frontShoulderMotor);
@@ -84,8 +74,8 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
         elbowEncoder.getConfigurator().apply(Devices.DoubleJointedArm.Elbow.cc_config);
 
-        shoulderFollower.setControl(
-                new Follower(Ports.DoubleJointedArm.SHOULDER_MOTOR, false));
+        backShoulderMotor.setControl(
+                new Follower(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR, false));
 
         // Status Signal initialization
         shoulderAngle = frontShoulderMotor.getPosition();

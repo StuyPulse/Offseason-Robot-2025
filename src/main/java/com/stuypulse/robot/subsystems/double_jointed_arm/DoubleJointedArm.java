@@ -46,9 +46,6 @@ public class DoubleJointedArm extends SubsystemBase {
     private DoubleJointedArmVisualizer visualizerMeasured;
     private DoubleJointedArmVisualizer visualizerSetpoint;
 
-    private DoubleJointedArmVisualizer visualizerMeasured;
-    private DoubleJointedArmVisualizer visualizerSetpoint;
-
     public DoubleJointedArm(DoubleJointedArmIO io) {
         this.io = io;
         state = ArmState.STOW;
@@ -63,16 +60,6 @@ public class DoubleJointedArm extends SubsystemBase {
     }
 
     public enum ArmState {
-        STOW(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(0)),
-        INT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
-        L4_FRONT(Rotation2d.fromDegrees(30), Rotation2d.fromDegrees(60)),
-        L4_BACK(Rotation2d.fromDegrees(150), Rotation2d.fromDegrees(-60)),
-        L3_FRONT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
-        L3_BACK(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-45)),
-        L2_FRONT(Rotation2d.fromDegrees(60), Rotation2d.fromDegrees(30)),
-        L2_BACK(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-30)),
-        L1_FRONT(Rotation2d.fromDegrees(75), Rotation2d.fromDegrees(15)),
-        L1_BACK(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-15));
         STOW(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(0)),
         INT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
         L4_FRONT(Rotation2d.fromDegrees(30), Rotation2d.fromDegrees(60)),
@@ -151,21 +138,10 @@ public class DoubleJointedArm extends SubsystemBase {
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleDeg")
     public double getElbowAngleDeg() {
         return Rotation2d.fromRadians(inputs.elbowAngle).getDegrees();
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleRad")
-    public Rotation2d getElbowAngleRad() {
-        return Rotation2d.fromRadians(inputs.elbowAngle);
     }
     
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleDeg")
-    public double getElbowAngleDeg() {
-        return Rotation2d.fromRadians(inputs.elbowAngle).getDegrees();
-    }
-    
-    @AutoLogOutput (key = "DoubleJointedArm/Arm/EndPosition")
     @AutoLogOutput (key = "DoubleJointedArm/Arm/EndPosition")
     public Translation2d getEndPosition() { // Forward Kinematics
-        Rotation2d shoulder = getShoulderAngleRad();
-        Rotation2d elbow = getElbowAngleRad();
         Rotation2d shoulder = getShoulderAngleRad();
         Rotation2d elbow = getElbowAngleRad();
 
@@ -178,7 +154,6 @@ public class DoubleJointedArm extends SubsystemBase {
     }
 
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AtTarget")
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AtTarget")
     public boolean isShoulderAtTarget() {
         double currentAngle = inputs.shoulderAngle;
         double targetAngle = state.getShoulderTarget().getRadians();
@@ -186,14 +161,12 @@ public class DoubleJointedArm extends SubsystemBase {
     }
 
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AtTarget")
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AtTarget")
     public boolean isElbowAtTarget() {
         double currentAngle = inputs.elbowAngle;
         double targetAngle = state.getElbowTarget().getRadians();
         return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Elbow.TOLERANCE;
     }
-
-    @AutoLogOutput (key = "DoubleJointedArm/Arm/AtTarget")
+    
     @AutoLogOutput (key = "DoubleJointedArm/Arm/AtTarget")
     public boolean isArmAtTarget() {
         return isShoulderAtTarget() && isElbowAtTarget();

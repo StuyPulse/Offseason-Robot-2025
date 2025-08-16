@@ -61,7 +61,7 @@ public interface Devices {
                     .withFFConstants(0, 0, 0, 0)
                     .withGravityType(GravityTypeValue.Arm_Cosine)
                     .withSensorToMechanismRatio(0)
-                    .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
+                    .withRemoteSensor(Ports.DoubleJointedArm.Shoulder.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
                     .withMotionProfile(0, 0);
 
             CANcoderConfiguration cc_config = new CANcoderConfiguration()
