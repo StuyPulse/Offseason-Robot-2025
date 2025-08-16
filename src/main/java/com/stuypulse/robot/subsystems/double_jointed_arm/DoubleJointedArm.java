@@ -11,6 +11,7 @@ import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Settings;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -306,6 +307,36 @@ public class DoubleJointedArm extends SubsystemBase {
                .plus(calculateGMatrix());
     }
 
+    public void setTargetAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle) {
+
+        // Plan path
+        List<Translation2d> path = pathPlanner.findPath(
+            getShoulderAngle(),
+            getElbowAngle(),
+            shoulderAngle,
+            elbowAngle
+        );
+
+        // Generate trajectory
+        currentTrajectory = new ArmSpline(
+            new double[]{
+                getShoulderAngle().getRadians(),
+                getElbowAngle().getRadians()
+            },
+            new double[]{0, 0}, // Start velocity
+            new double[]{0, 0}, // Start acceleration
+            new double[]{
+                shoulderAngle.getRadians(),
+                elbowAngle.getRadians()
+            },
+            new double[]{0, 0}, // End velocity
+            new double[]{0, 0}, // End acceleration
+            2.0     // Duration
+        ).sampleTrajectory(50);
+        
+        trajectoryIndex = 0;
+    }
+
     @Override
     public void periodic() {
 
@@ -327,6 +358,14 @@ public class DoubleJointedArm extends SubsystemBase {
         if (intermediate && isArmAtTarget()) {
             setState(storedState);
             intermediate = false;
+        }
+
+        if (currentTrajectory != null && trajectoryIndex < currentTrajectory.size()) {
+            ArmTrajectoryPoint setpoint = currentTrajectory.get(trajectoryIndex++);
+            setTargetAngles(
+                Rotation2d.fromRadians(setpoint.theta1),
+                Rotation2d.fromRadians(setpoint.theta2)
+            );
         }
 
         io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));

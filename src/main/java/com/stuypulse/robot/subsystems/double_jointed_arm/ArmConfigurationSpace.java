@@ -18,7 +18,7 @@ public class ArmConfigurationSpace {
     private final double elbowLength = Constants.DoubleJointedArm.Elbow.LENGTH;
 
     private final boolean[][] obstaclePoint; // Cartesian (Should get rid of?)
-    private final List<Pair<Rotation2d, Rotation2d>> obstaclePoints; // Radians
+    private final List<Translation2d> obstaclePoints; // Radians
     private final double cartesianGrid = 100;
     
     // For visualization (Sim)
@@ -105,7 +105,10 @@ public class ArmConfigurationSpace {
 
     // Add obstacle in Cartesian space
     public void addObstacle(Translation2d point) {
-        Pair<Pair<Rotation2d, Rotation2d>, Pair<Rotation2d, Rotation2d>> angles = toJointAngles(point);
+        Pair<Translation2d, Translation2d> angles = new Pair<>(new Translation2d(toJointAngles(point).getFirst().getFirst().getRadians(), 
+                                                                                toJointAngles(point).getFirst().getSecond().getRadians()), 
+                                                               new Translation2d(toJointAngles(point).getSecond().getFirst().getRadians(), 
+                                                                                toJointAngles(point).getSecond().getSecond().getRadians()));
 
         if (angles != null) {
 
@@ -117,7 +120,7 @@ public class ArmConfigurationSpace {
         }
     }
 
-    // Check if configuration is valid (I think SLMath.clamp() got this? Double check)
+    // Check if configuration is valid 
     public boolean isValidConfiguration(Rotation2d theta1, Rotation2d theta2) {
     
         if (theta1.getRadians() < shoulderMinAngle.getRadians() || theta1.getRadians() > shoulderMaxAngle.getRadians() || 
@@ -126,7 +129,7 @@ public class ArmConfigurationSpace {
         }
         
         // Check obstacle grid
-        Pair<Rotation2d, Rotation2d> point = new Pair<>(new Rotation2d(theta1.getRadians()), new Rotation2d(theta2.getRadians()));
+        Translation2d point = new Translation2d(theta1.getRadians(), theta2.getRadians());
 
         for (int i = 0; i < obstaclePoints.size(); i++) {
             if (point.equals(obstaclePoints.get(i))) {
