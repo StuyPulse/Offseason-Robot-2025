@@ -82,4 +82,8 @@ public class ArmSpline {
         }
         return points;
     }
+
+    public double getDuration() {
+        return duration;
+    }
 }

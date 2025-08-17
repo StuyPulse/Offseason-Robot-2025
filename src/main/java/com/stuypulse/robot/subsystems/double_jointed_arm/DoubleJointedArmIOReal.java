@@ -74,9 +74,6 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
         elbowEncoder.getConfigurator().apply(Devices.DoubleJointedArm.Elbow.cc_config);
 
-        backShoulderMotor.setControl(
-                new Follower(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR, false));
-
         // Status Signal initialization
         shoulderAngle = frontShoulderMotor.getPosition();
         shoulderAngularVel = frontShoulderMotor.getVelocity();

@@ -17,6 +17,10 @@ public interface Settings {
     String CANIVORE = "CANIVORE";
     double TARGET_DISTANCE_FROM_REEF = 0;
     public interface DoubleJointedArm {
+
+        public static final double PATH_DT = 0.1; // Time between path points (sec)
+        public static final double SPLINE_DURATION = 0.5; // Duration per spline segment
+
         public interface Shoulder {
 
             double DEFAULT = 0.0;

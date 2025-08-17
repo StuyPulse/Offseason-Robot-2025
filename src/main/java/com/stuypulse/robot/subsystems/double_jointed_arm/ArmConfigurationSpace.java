@@ -137,7 +137,7 @@ public class ArmConfigurationSpace {
             }
         }
 
-        return false;
+        return !obstaclePoints.contains(point);
 
     }
 }

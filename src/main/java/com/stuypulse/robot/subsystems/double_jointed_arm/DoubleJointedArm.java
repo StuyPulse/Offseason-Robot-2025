@@ -1,5 +1,6 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ejml.simple.SimpleMatrix;
@@ -11,16 +12,15 @@ import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Settings;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,6 +53,13 @@ public class DoubleJointedArm extends SubsystemBase {
         storedState = ArmState.STOW;
         intermediate = false;
 
+        shoulderPID.setIntegratorRange(-2, 2);
+        elbowPID.setIntegratorRange(-1, 1);
+
+        // Idk abt this one
+        shoulderPID.enableContinuousInput(-Math.PI, Math.PI);
+        elbowPID.enableContinuousInput(-Math.PI, Math.PI);
+
         visualizerMeasured = new DoubleJointedArmVisualizer("ArmMeasured", null);
         visualizerSetpoint = new DoubleJointedArmVisualizer("ArmSetpoint", new Color8Bit(Color.kOrange));
 
@@ -70,15 +77,27 @@ public class DoubleJointedArm extends SubsystemBase {
         L2_FRONT(Rotation2d.fromDegrees(60), Rotation2d.fromDegrees(30)),
         L2_BACK(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-30)),
         L1_FRONT(Rotation2d.fromDegrees(75), Rotation2d.fromDegrees(15)),
-        L1_BACK(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-15));
+        L1_BACK(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-15)),
+
+        CUSTOM(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)) {
+            @Override
+            public void setAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle) {
+                this.shoulderAngle = shoulderAngle;
+                this.elbowAngle = elbowAngle;
+            }
+        };
 
         private ArmState(Rotation2d shoulderAngle, Rotation2d elbowAngle){
             this.shoulderAngle = shoulderAngle;
             this.elbowAngle = elbowAngle;
         }
 
-        private Rotation2d shoulderAngle;
-        private Rotation2d elbowAngle;
+        public synchronized void setAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle) {
+            throw new UnsupportedOperationException("Only CUSTOM state supports dynamic angles");
+        }
+
+        protected Rotation2d shoulderAngle;
+        protected Rotation2d elbowAngle;
 
         public Rotation2d getShoulderTarget() { return shoulderAngle; }
         public Rotation2d getElbowTarget() { return elbowAngle; }
@@ -198,8 +217,24 @@ public class DoubleJointedArm extends SubsystemBase {
     // Configuration Space + PathPlanner
     private final ArmConfigurationSpace configSpace; 
     private final ArmPathPlanner pathPlanner;
-    private List<ArmTrajectoryPoint> currentTrajectory;
-    private int trajectoryIndex = 0;
+
+    private List<ArmSpline> trajectorySplines = new ArrayList<>();
+    private int currentSplineIndex = 0;
+    private double splineStartTime = 0;
+    private boolean isFollowingTrajectory = false;
+
+    // PID Controllers
+    private final PIDController shoulderPID = new PIDController(
+        Settings.DoubleJointedArm.Shoulder.PID.kP,
+        Settings.DoubleJointedArm.Shoulder.PID.kI,
+        Settings.DoubleJointedArm.Shoulder.PID.kD
+    );
+
+    private final PIDController elbowPID = new PIDController(
+        Settings.DoubleJointedArm.Elbow.PID.kP,
+        Settings.DoubleJointedArm.Elbow.PID.kI,
+        Settings.DoubleJointedArm.Elbow.PID.kD
+    );
 
     /*
      * @param position The angles of the joints, (θ1, θ2). Note that θ2 is relative to the first joint, not the horizontal
@@ -309,32 +344,44 @@ public class DoubleJointedArm extends SubsystemBase {
 
     public void setTargetAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle) {
 
-        // Plan path
         List<Translation2d> path = pathPlanner.findPath(
             getShoulderAngle(),
             getElbowAngle(),
             shoulderAngle,
             elbowAngle
         );
-
-        // Generate trajectory
-        currentTrajectory = new ArmSpline(
-            new double[]{
-                getShoulderAngle().getRadians(),
-                getElbowAngle().getRadians()
-            },
-            new double[]{0, 0}, // Start velocity
-            new double[]{0, 0}, // Start acceleration
-            new double[]{
-                shoulderAngle.getRadians(),
-                elbowAngle.getRadians()
-            },
-            new double[]{0, 0}, // End velocity
-            new double[]{0, 0}, // End acceleration
-            2.0     // Duration
-        ).sampleTrajectory(50);
+    
+        if (path.isEmpty()) {
+            System.out.println("No valid path found!");
+            return;
+        }
+    
+        // Generate splines between waypoints
+        trajectorySplines.clear();
+        for (int i = 0; i < path.size() - 1; i++) {
+            Translation2d start = path.get(i);
+            Translation2d end = path.get(i+1);
+            
+            // Calculate approximate velocities (tangent to path)
+            Translation2d prevVel = (i == 0) ? new Translation2d() : 
+                path.get(i).minus(path.get(i-1)).div(Settings.DoubleJointedArm.PATH_DT);
+            Translation2d nextVel = i == path.size()-2 ? new Translation2d() : 
+                path.get(i+2).minus(path.get(i+1)).div(Settings.DoubleJointedArm.PATH_DT);
+            
+            trajectorySplines.add(new ArmSpline(
+                new double[]{start.getX(), start.getY()},  // Start angles
+                new double[]{prevVel.getX(), prevVel.getY()},  // Start velocities
+                new double[]{0, 0},  // Start accelerations
+                new double[]{end.getX(), end.getY()},  // End angles
+                new double[]{nextVel.getX(), nextVel.getY()},  // End velocities
+                new double[]{0, 0},  // End accelerations
+                Settings.DoubleJointedArm.SPLINE_DURATION  // Segment duration
+            ));
+        }
         
-        trajectoryIndex = 0;
+        currentSplineIndex = 0;
+        splineStartTime = Timer.getFPGATimestamp();
+        isFollowingTrajectory = true;
     }
 
     @Override
@@ -348,28 +395,65 @@ public class DoubleJointedArm extends SubsystemBase {
 
         double shoulderAccelRad = inputs.shoulderAngularAccel;
         double elbowRelativeAccelRad = inputs.elbowAngularAccel;
-
-        Matrix<N2, N1> positions = VecBuilder.fill(shoulderAngleRad, elbowRelativeRad);
-        Matrix<N2, N1> velocities = VecBuilder.fill(shoulderVelRad, elbowRelativeVelRad);
-        Matrix<N2, N1> accelerations = VecBuilder.fill(shoulderAccelRad, elbowRelativeAccelRad);
-        
-        Matrix<N2, N1> ff = feedforwardVoltage(positions, velocities, accelerations);
         
         if (intermediate && isArmAtTarget()) {
             setState(storedState);
             intermediate = false;
         }
 
-        if (currentTrajectory != null && trajectoryIndex < currentTrajectory.size()) {
-            ArmTrajectoryPoint setpoint = currentTrajectory.get(trajectoryIndex++);
-            setTargetAngles(
-                Rotation2d.fromRadians(setpoint.theta1),
-                Rotation2d.fromRadians(setpoint.theta2)
+        if (isFollowingTrajectory) {
+            double currentTime = Timer.getFPGATimestamp() - splineStartTime;
+            ArmSpline currentSpline = trajectorySplines.get(currentSplineIndex);
+            double progress = Math.min(currentTime / currentSpline.getDuration(), 1.0);
+            
+            ArmTrajectoryPoint setpoint = currentSpline.getPoint(progress);
+            
+            // Calculate feedforward
+            Matrix<N2, N1> ff = feedforwardVoltage(
+                VecBuilder.fill(setpoint.theta1, setpoint.theta2),
+                VecBuilder.fill(setpoint.omega1, setpoint.omega2),
+                VecBuilder.fill(setpoint.alpha1, setpoint.alpha2)
             );
+            
+            // PID corrections
+            double shoulderCorrection = shoulderPID.calculate(
+                getShoulderAngle().getRadians(),
+                setpoint.theta1
+            );
+            
+            double elbowCorrection = elbowPID.calculate(
+                getElbowAngle().getRadians(),
+                setpoint.theta2
+            );
+            
+            // Command motors
+            io.controlShoulder(
+                Rotation2d.fromRadians(setpoint.theta1),
+                ff.get(0, 0) + shoulderCorrection
+            );
+            
+            io.controlElbow(
+                Rotation2d.fromRadians(setpoint.theta2),
+                ff.get(1, 0) + elbowCorrection
+            );
+            
+            // Transition logic
+            if (currentTime >= currentSpline.getDuration()) {
+                if (currentSplineIndex < trajectorySplines.size() - 1) {
+                    currentSplineIndex++;
+                    splineStartTime = Timer.getFPGATimestamp();
+                    shoulderPID.reset();
+                    elbowPID.reset();
+                } else {
+                    isFollowingTrajectory = false;
+                    state = ArmState.CUSTOM;
+                    state.setAngles(
+                        Rotation2d.fromRadians(setpoint.theta1),
+                        Rotation2d.fromRadians(setpoint.theta2)
+                    );
+                }
+            }
         }
-
-        io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
-        io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
 
         visualizerMeasured.update(shoulderAngleRad, elbowRelativeRad);
         visualizerSetpoint.update(state.getShoulderTarget().getRadians(), state.getElbowTarget().getRadians());
