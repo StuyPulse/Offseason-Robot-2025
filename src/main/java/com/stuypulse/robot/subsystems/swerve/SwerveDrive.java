@@ -58,7 +58,7 @@ public class SwerveDrive extends SubsystemBase {
     protected SwerveDrive(SwerveModule... modules) {
         this.modules = modules;
 
-        gyro = new Pigeon2(9, Settings.CANIVORE);
+        gyro = new Pigeon2(Ports.Swerve.PIGEON, Settings.CANIVORE);
 
         kinematics = new SwerveDriveKinematics(getModuleOffsets());
 

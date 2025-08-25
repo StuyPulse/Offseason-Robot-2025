@@ -1,5 +1,7 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
+import org.littletonrobotics.junction.AutoLog;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
@@ -32,6 +34,10 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
     private final StatusSignal<Voltage> shoulderAppliedVoltage;
     private final StatusSignal<Current> shoulderCurrentAmps;
 
+    private final StatusSignal<Angle> shoulderEncoderAngle;
+    private final StatusSignal<AngularVelocity> shoulderEncoderAngularVel;
+    private final StatusSignal<Voltage> shoulderEncoderSuppliedVoltage;
+
     private final StatusSignal<Angle> shoulderFollowerAngle;
     private final StatusSignal<AngularVelocity> shoulderFollowerAngularVel;
     private final StatusSignal<AngularAcceleration> shoulderFollowerAngularAccel;
@@ -61,11 +67,13 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         Devices.DoubleJointedArm.Elbow.motor_config.configure(elbow);
         elbowEncoder.getConfigurator().apply(Devices.DoubleJointedArm.Elbow.cc_config);
 
+        //shoulderEncoder.setPosition(0.25);//-shoulder.getPosition().getValueAsDouble()-.25);
+
         shoulderFollower.setControl(
                 new Follower(Ports.DoubleJointedArm.SHOULDER_MOTOR, false));
 
         // Status Signal initialization
-        shoulderAngle = shoulder.getPosition();
+        shoulderAngle = shoulderEncoder.getPosition();
         shoulderAngularVel = shoulder.getVelocity();
         shoulderAngularAccel = shoulder.getAcceleration();
         shoulderAppliedVoltage = shoulder.getMotorVoltage();
@@ -76,6 +84,10 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         shoulderFollowerAngularAccel = shoulderFollower.getAcceleration();
         shoulderFollowerAppliedVoltage = shoulderFollower.getMotorVoltage();
         shoulderFollowerCurrentAmps = shoulderFollower.getTorqueCurrent();
+
+        shoulderEncoderAngle = shoulderEncoder.getPosition();
+        shoulderEncoderAngularVel = shoulderEncoder.getVelocity();
+        shoulderEncoderSuppliedVoltage = shoulderEncoder.getSupplyVoltage();
 
         elbowAngle = elbow.getPosition();
         elbowAngularVel = elbow.getVelocity();
@@ -95,6 +107,10 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
             shoulderFollowerAngularVel,
             shoulderFollowerAngularAccel,
             shoulderFollowerAppliedVoltage,
+
+            shoulderEncoderAngle,
+            shoulderEncoderAngularVel,
+            shoulderEncoderSuppliedVoltage,
 
             elbowAngle,
             elbowAngularVel,
@@ -136,7 +152,7 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         inputs.shoulderFollowerCurrentAmps = shoulderFollowerCurrentAmps.getValueAsDouble();
 
         inputs.elbowMotorConnected = elbow.isConnected();
-        inputs.elbowAngle = elbowAngle.getValueAsDouble() * 2.0 * Math.PI;
+        inputs.elbowAngle = elbowAngle.getValueAsDouble();// * 2.0 * Math.PI;
         inputs.elbowAngularVel = elbowAngularVel.getValueAsDouble() * 2.0 * Math.PI;
         inputs.elbowAngularAccel = elbowAngularAccel.getValueAsDouble() * 2.0 * Math.PI;
         inputs.elbowAppliedVoltage = elbowAppliedVoltage.getValueAsDouble();
