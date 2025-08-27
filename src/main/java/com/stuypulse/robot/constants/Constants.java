@@ -30,11 +30,11 @@ public interface Constants {
             double MASS = 1.0;
 
             double MOTOR_GEAR_RATIO = 1.0 / 85.0;
-            double ENCODER_GEAR_RATIO = 4.625 / 1;
+            double ENCODER_GEAR_RATIO = 2 / 1;
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
 
-            double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
-            double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
+            double ENCODER_OFFSET_ROT = 0.0/360.0;
+            double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(200.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-100);
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);

@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -138,6 +139,7 @@ public class DoubleJointedArm extends SubsystemBase {
         Logger.recordOutput("DoubleJointedArm/Joints/Shoulder/TargetDeg", state.getShoulderTarget().getDegrees());
         Logger.recordOutput("DoubleJointedArm/Joints/Elbow/TargetDeg", state.getElbowTarget().getDegrees());
         Logger.recordOutput("DoubleJointedArm/Arm/AtTarget", isArmAtTarget());
+        //Logger.recordOutput("DoubleJointedArm/Shoulder/Encoder raw", state.getRawEncoder());
     }
 
     /* GETTERS */

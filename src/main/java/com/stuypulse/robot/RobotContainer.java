@@ -31,7 +31,7 @@ public class RobotContainer {
     // Subsystem
     private DoubleJointedArm dja;
     private Wrist wrist;
-    private SwerveDrive swerve;
+    // private SwerveDrive swerve;
 
     // Autons
     private static SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -44,7 +44,7 @@ public class RobotContainer {
               // Real robot, instantiate hardware IO implementations
               dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
               wrist = new Wrist(new WristIOReal());
-              swerve = SwerveDrive.getInstance();
+              // swerve = SwerveDrive.getInstance();
               break;
       
             case SIM:
