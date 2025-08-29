@@ -104,6 +104,14 @@ public class DoubleJointedArm extends SubsystemBase {
         }
     }
 
+    public void runShoulder(double volts) {
+        io.runVoltageShoulder(volts);
+    }
+
+    public void runElbow(double volts) {
+        io.runVoltageElbow(volts);
+    }
+
     @Override
     public void periodic() {
 
@@ -122,13 +130,14 @@ public class DoubleJointedArm extends SubsystemBase {
         
         Matrix<N2, N1> ff = feedforwardVoltage(positions, velocities, accelerations);
         
-        if (intermediate && isArmAtTarget()) {
-            setState(storedState);
-            intermediate = false;
-        }
 
-        io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
-        io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
+        // if (intermediate && isArmAtTarget()) {
+        //     setState(storedState);
+        //     intermediate = false;
+        // }
+
+        // io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
+        // io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
 
         visualizerMeasured.update(shoulderAngleRad, elbowRelativeRad);
         visualizerSetpoint.update(state.getShoulderTarget().getRadians(), state.getElbowTarget().getRadians());

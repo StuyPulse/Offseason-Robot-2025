@@ -5,6 +5,8 @@
 
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.ArmRunVoltage;
+import com.stuypulse.robot.commands.ArmStop;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
@@ -44,7 +46,7 @@ public class RobotContainer {
               // Real robot, instantiate hardware IO implementations
               dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
               wrist = new Wrist(new WristIOReal());
-              // swerve = SwerveDrive.getInstance();
+              // swerve = SwerveDrive.getInstance();`
               break;
       
             case SIM:
@@ -75,7 +77,11 @@ public class RobotContainer {
     /*** BUTTONS ***/
     /***************/
 
-    private void configureButtonBindings() {}
+    private void configureButtonBindings() {
+      driver.getBottomButton()
+        .onTrue(new ArmRunVoltage())
+        .onFalse(new ArmStop());
+    }
 
     /**************/
     /*** AUTONS ***/
