@@ -136,8 +136,10 @@ public class DoubleJointedArm extends SubsystemBase {
         //     intermediate = false;
         // }
 
-        // io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
+        io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
         // io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
+
+        Logger.recordOutput("DoubleJointedArm/Arm/Feedforward weirdbaby", ff.get(0, 0));
 
         visualizerMeasured.update(shoulderAngleRad, elbowRelativeRad);
         visualizerSetpoint.update(state.getShoulderTarget().getRadians(), state.getElbowTarget().getRadians());
@@ -161,22 +163,22 @@ public class DoubleJointedArm extends SubsystemBase {
 
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleRad")
     public Rotation2d getShoulderAngleRad() {
-        return Rotation2d.fromRadians(inputs.shoulderAngle);
+        return Rotation2d.fromDegrees(inputs.shoulderAngle);
     }
 
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleDeg")
     public double getShoulderAngleDeg() {
-        return Rotation2d.fromRadians(inputs.shoulderAngle).getDegrees();
+        return inputs.shoulderAngle;
     }
     
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleRad")
     public Rotation2d getElbowAngleRad() {
-        return Rotation2d.fromRadians(inputs.elbowAngle);
+        return Rotation2d.fromDegrees(inputs.elbowAngle);
     }
     
     @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleDeg")
     public double getElbowAngleDeg() {
-        return Rotation2d.fromRadians(inputs.elbowAngle).getDegrees();
+        return inputs.elbowAngle;
     }
     
     @AutoLogOutput (key = "DoubleJointedArm/Arm/EndPosition")
