@@ -101,12 +101,12 @@ public class DoubleJointedArmIOSim implements DoubleJointedArmIO {
         previousShoulderVel = shoulderVel;
         previousElbowVel = elbowVel;
 
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderVoltage", shoulderAppliedVolts);
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowVoltage", elbowAppliedVolts);
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderVel", shoulderVel);
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowVel", elbowVel);
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderAccel", shoulderAccel);
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowAccel", elbowAccel);
+        Logger.recordOutput("DJA/Sim/ShoulderVoltage", shoulderAppliedVolts);
+        Logger.recordOutput("DJA/Sim/ElbowVoltage", elbowAppliedVolts);
+        Logger.recordOutput("DJA/Sim/ShoulderVel", shoulderVel);
+        Logger.recordOutput("DJA/Sim/ElbowVel", elbowVel);
+        Logger.recordOutput("DJA/Sim/ShoulderAccel", shoulderAccel);
+        Logger.recordOutput("DJA/Sim/ElbowAccel", elbowAccel);
     }
 
     @Override
@@ -129,11 +129,11 @@ public class DoubleJointedArmIOSim implements DoubleJointedArmIO {
         
         runVoltageShoulder(totalVoltage);
         
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderPIDOutput", pidOutput);
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderFeedforward", limitedFeedforward);
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderError", Math.toDegrees(error));
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderTarget", Math.toDegrees(targetAngle));
-        Logger.recordOutput("DoubleJointedArm/Sim/ShoulderCurrent", Math.toDegrees(currentAngle));
+        Logger.recordOutput("DJA/Sim/ShoulderPIDOutput", pidOutput);
+        Logger.recordOutput("DJA/Sim/ShoulderFeedforward", limitedFeedforward);
+        Logger.recordOutput("DJA/Sim/ShoulderError", Math.toDegrees(error));
+        Logger.recordOutput("DJA/Sim/ShoulderTarget", Math.toDegrees(targetAngle));
+        Logger.recordOutput("DJA/Sim/ShoulderCurrent", Math.toDegrees(currentAngle));
     }
 
     @Override
@@ -156,11 +156,11 @@ public class DoubleJointedArmIOSim implements DoubleJointedArmIO {
         
         runVoltageElbow(totalVoltage);
         
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowPIDOutput", pidOutput);
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowFeedforward", limitedFeedforward);
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowError", Math.toDegrees(error));
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowTarget", Math.toDegrees(targetAngle));
-        Logger.recordOutput("DoubleJointedArm/Sim/ElbowCurrent", Math.toDegrees(currentAngle));
+        Logger.recordOutput("DJA/Sim/ElbowPIDOutput", pidOutput);
+        Logger.recordOutput("DJA/Sim/ElbowFeedforward", limitedFeedforward);
+        Logger.recordOutput("DJA/Sim/ElbowError", Math.toDegrees(error));
+        Logger.recordOutput("DJA/Sim/ElbowTarget", Math.toDegrees(targetAngle));
+        Logger.recordOutput("DJA/Sim/ElbowCurrent", Math.toDegrees(currentAngle));
     }
 
     @Override

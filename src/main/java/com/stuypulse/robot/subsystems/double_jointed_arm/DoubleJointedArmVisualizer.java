@@ -70,7 +70,7 @@ public class DoubleJointedArmVisualizer {
     double elbowAngleDegrees = Units.radiansToDegrees(elbowAngle); // relative to shoulder
     elbowLigament.setAngle(elbowAngleDegrees);
     
-    Logger.recordOutput("DoubleJointedArm/VisualizerMechanism2d/" + logKey, mechanism);
+    Logger.recordOutput("DJA/VisualizerMechanism2d/" + logKey, mechanism);
 
     // Base pose at origin
     var basePose = new Pose3d(0.0, 0.0, Constants.DoubleJointedArm.BASE_HEIGHT, new Rotation3d());
@@ -90,9 +90,9 @@ public class DoubleJointedArmVisualizer {
             new Translation3d(l2, 0.0, 0.0),
             new Rotation3d()));
     
-    Logger.recordOutput("DoubleJointedArm/Visualizer/Mechanism3d/" + logKey, shoulderPose, elbowPose, endEffectorPose);
+    Logger.recordOutput("DJA/Visualizer/Mechanism3d/" + logKey, shoulderPose, elbowPose, endEffectorPose);
     
-    Logger.recordOutput("DoubleJointedArm/Visualizer/Mechanism/" + logKey + "/ShoulderAngleDeg", shoulderAngleDegrees);
-    Logger.recordOutput("DoubleJointedArm/Visualizer/Mechanism/" + logKey + "/ElbowAngleDeg", elbowAngleDegrees);
+    Logger.recordOutput("DJA/Visualizer/Mechanism/" + logKey + "/ShoulderAngleDeg", shoulderAngleDegrees);
+    Logger.recordOutput("DJA/Visualizer/Mechanism/" + logKey + "/ElbowAngleDeg", elbowAngleDegrees);
   }
 }

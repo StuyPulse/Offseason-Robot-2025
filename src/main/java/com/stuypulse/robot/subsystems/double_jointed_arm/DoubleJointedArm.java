@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -136,21 +135,19 @@ public class DoubleJointedArm extends SubsystemBase {
         //     intermediate = false;
         // }
 
-        io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
+        // io.controlShoulder(state.getShoulderTarget(), ff.get(0, 0));
         // io.controlElbow(state.getElbowTarget(), ff.get(1, 0));
 
-        Logger.recordOutput("DoubleJointedArm/Arm/Feedforward weirdbaby", ff.get(0, 0));
+        Logger.recordOutput("DJA/Feedforward weirdbaby", ff.get(0, 0));
 
         visualizerMeasured.update(shoulderAngleRad, elbowRelativeRad);
         visualizerSetpoint.update(state.getShoulderTarget().getRadians(), state.getElbowTarget().getRadians());
 
         io.updateInputs(inputs);
-        Logger.processInputs("DoubleJointedArm/", inputs);
-        Logger.recordOutput("DoubleJointedArm/Arm/State", state.name());
-        Logger.recordOutput("DoubleJointedArm/Joints/Shoulder/TargetDeg", state.getShoulderTarget().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/Joints/Elbow/TargetDeg", state.getElbowTarget().getDegrees());
-        Logger.recordOutput("DoubleJointedArm/Arm/AtTarget", isArmAtTarget());
-        //Logger.recordOutput("DoubleJointedArm/Shoulder/Encoder raw", state.getRawEncoder());
+        Logger.processInputs("DJA/", inputs);
+        Logger.recordOutput("DJA/State", state.name());
+        Logger.recordOutput("DJA/Shoulder Target (deg)", state.getShoulderTarget().getDegrees());
+        Logger.recordOutput("DJA/Elbow Target (deg)", state.getElbowTarget().getDegrees());
     }
 
     /* GETTERS */
@@ -160,55 +157,37 @@ public class DoubleJointedArm extends SubsystemBase {
         return state;
     }
     
-
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleRad")
-    public Rotation2d getShoulderAngleRad() {
-        return Rotation2d.fromDegrees(inputs.shoulderAngle);
-    }
-
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AngleDeg")
-    public double getShoulderAngleDeg() {
-        return inputs.shoulderAngle;
-    }
     
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleRad")
-    public Rotation2d getElbowAngleRad() {
-        return Rotation2d.fromDegrees(inputs.elbowAngle);
-    }
-    
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AngleDeg")
-    public double getElbowAngleDeg() {
-        return inputs.elbowAngle;
-    }
-    
-    @AutoLogOutput (key = "DoubleJointedArm/Arm/EndPosition")
+    @AutoLogOutput (key = "DJA/Arm End Position")
     public Translation2d getEndPosition() { // Forward Kinematics
-        Rotation2d shoulder = getShoulderAngleRad();
-        Rotation2d elbow = getElbowAngleRad();
+        Rotation2d shoulder = Rotation2d.fromDegrees(inputs.shoulderAngle);
+        Rotation2d elbow = Rotation2d.fromDegrees(inputs.elbowAngle);
+
+        Logger.recordOutput("DJA/Shoulder Angle (rad)", shoulder.getRadians());
+        Logger.recordOutput("DJA/Elbow Angle (rad)", elbow.getRadians());
 
         Transform2d startPoint = new Transform2d(0.0, Constants.DoubleJointedArm.BASE_HEIGHT, new Rotation2d());
-
         return startPoint
             .plus(new Transform2d(Constants.DoubleJointedArm.Shoulder.LENGTH, 0.0, shoulder))
             .plus(new Transform2d(Constants.DoubleJointedArm.Elbow.LENGTH, 0.0, elbow.minus(Rotation2d.fromRadians(180.0 - shoulder.getRadians()))))
             .getTranslation();
     }
 
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Shoulder/AtTarget")
+    @AutoLogOutput (key = "DJA/Shoulder At Target")
     public boolean isShoulderAtTarget() {
         double currentAngle = inputs.shoulderAngle;
         double targetAngle = state.getShoulderTarget().getRadians();
+        
         return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Shoulder.ANGLE_TOLERANCE.getRadians();
     }
 
-    @AutoLogOutput (key = "DoubleJointedArm/Joints/Elbow/AtTarget")
+    @AutoLogOutput (key = "DJA/Elbow At Target")
     public boolean isElbowAtTarget() {
         double currentAngle = inputs.elbowAngle;
         double targetAngle = state.getElbowTarget().getRadians();
         return Math.abs(currentAngle - targetAngle) < Settings.DoubleJointedArm.Elbow.ANGLE_TOLERANCE.getRadians();
     }
 
-    @AutoLogOutput (key = "DoubleJointedArm/Arm/AtTarget")
     public boolean isArmAtTarget() {
         return isShoulderAtTarget() && isElbowAtTarget();
     }
