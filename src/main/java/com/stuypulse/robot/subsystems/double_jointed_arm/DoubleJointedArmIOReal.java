@@ -125,7 +125,10 @@ public class DoubleJointedArmIOReal implements DoubleJointedArmIO {
         );
 
         inputs.shoulderMotorConnected = shoulder.isConnected();
-        inputs.shoulderAngle = -shoulderEncoder.getPosition().getValueAsDouble() * 360 * 90.0/430.0 + 120;
+
+        // inputs.shoulderAngle = -shoulderEncoder.getPosition().getValueAsDouble() * 360 * 90.0/430.0 + 120;
+        inputs.shoulderAngle = shoulder.getPosition().getValueAsDouble();
+
         inputs.shoulderAngularVel = shoulderAngularVel.getValueAsDouble() * 2.0 * Math.PI;
         inputs.shoulderAngularAccel = shoulderAngularAccel.getValueAsDouble() * 2.0 * Math.PI;
         inputs.shoulderAppliedVoltage = shoulderAppliedVoltage.getValueAsDouble();

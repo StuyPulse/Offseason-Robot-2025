@@ -49,7 +49,11 @@ public interface Devices {
                 .withFFConstants(0, 0, 0, 0)
                 .withGravityType(GravityTypeValue.Arm_Cosine)
                 .withSensorToMechanismRatio(0)
-                .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
+                .withRemoteSensor(
+                    Ports.DoubleJointedArm.SHOULDER_ENCODER, 
+                    FeedbackSensorSourceValue.RemoteCANcoder, 
+                    Constants.DoubleJointedArm.Shoulder.GEAR_RATIO, 
+                    Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT)
                 .withMotionProfile(0, 0);
 
             TalonFXConfig motor_followerConfig = new TalonFXConfig()
@@ -64,12 +68,12 @@ public interface Devices {
                     .withRemoteSensor(Ports.DoubleJointedArm.SHOULDER_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
                     .withMotionProfile(0, 0);
 
-            CANcoderConfiguration cc_config = new CANcoderConfiguration()
-            .withMagnetSensor(
-                new MagnetSensorConfigs()
-                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                    .withMagnetOffset(Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT)
-                    .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Shoulder.ENCODER_UPPER_LIMIT_ROT));
+            CANcoderConfiguration cc_config = new CANcoderConfiguration();
+            // .withMagnetSensor(
+            //     new MagnetSensorConfigs()
+                    // .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                    // .withMagnetOffset(Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT)
+                    // .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Shoulder.ENCODER_UPPER_LIMIT_ROT));
         }
 
         public interface Elbow {
@@ -290,6 +294,18 @@ public interface Devices {
         }
 
         // FEEDBACK CONFIGS
+
+        public TalonFXConfig withRemoteSensor(
+                int ID, FeedbackSensorSourceValue source, double rotorToSensorRatio, double rotorOffsetRot) {
+            feedbackConfigs.FeedbackRemoteSensorID = ID;
+            feedbackConfigs.FeedbackSensorSource = source;
+            feedbackConfigs.RotorToSensorRatio = rotorToSensorRatio;
+            feedbackConfigs.FeedbackRotorOffset = rotorOffsetRot;
+
+            configuration.withFeedback(feedbackConfigs);
+
+            return this;
+        }
 
         public TalonFXConfig withRemoteSensor(
                 int ID, FeedbackSensorSourceValue source, double rotorToSensorRatio) {
