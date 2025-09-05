@@ -10,14 +10,14 @@ public interface Ports {
 
     public interface DoubleJointedArm {
         public interface Shoulder {
-            int FRONT_MOTOR = 0;
-            int BACK_MOTOR = 0;
-            int ENCODER = 0;
+            int FRONT_MOTOR = 14;
+            int BACK_MOTOR = 15;
+            int ENCODER = 17;
         }
 
         public interface Elbow {
-            int MOTOR = 0;
-            int ENCODER = 0;
+            int MOTOR = 16;
+            int ENCODER = 18;
         }
 
     }

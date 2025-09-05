@@ -13,11 +13,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.stuypulse.robot.constants.Constants;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends LoggedRobot {
+public class Robot extends TimedRobot {
 
     private static Alliance alliance;
 
@@ -25,31 +27,31 @@ public class Robot extends LoggedRobot {
     private Command auto;
 
     public Robot() {
-        Logger.recordMetadata("OFFSEASON_ROBOT_25", "ROBOT_PROJECT"); // Set a metadata value
+        // Logger.recordMetadata("OFFSEASON_ROBOT_25", "ROBOT_PROJECT"); // Set a metadata value
 
-        // Set up data receivers & replay source
-        switch (Constants.currentMode) {
-            case REAL:
-            // Running on a real robot, log to a USB stick ("/U/logs")
-            Logger.addDataReceiver(new WPILOGWriter());
-            Logger.addDataReceiver(new NT4Publisher());
-            break;
+        // // Set up data receivers & replay source
+        // switch (Constants.currentMode) {
+        //     case REAL:
+        //     // Running on a real robot, log to a USB stick ("/U/logs")
+        //     Logger.addDataReceiver(new WPILOGWriter());
+        //     Logger.addDataReceiver(new NT4Publisher());
+        //     break;
 
-            case SIM:
-            // Running a physics simulator, log to NT
-            Logger.addDataReceiver(new NT4Publisher());
-            break;
+        //     case SIM:
+        //     // Running a physics simulator, log to NT
+        //     Logger.addDataReceiver(new NT4Publisher());
+        //     break;
 
-            case REPLAY:
-            // // Replaying a log, set up replay source
-            // setUseTiming(false); // Run as fast as possible
-            // String logPath = LogFileUtil.findReplayLog();
-            // Logger.setReplaySource(new WPILOGReader(logPath));
-            // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-            break;
-        }
+        //     case REPLAY:
+        //     // // Replaying a log, set up replay source
+        //     // setUseTiming(false); // Run as fast as possible
+        //     // String logPath = LogFileUtil.findReplayLog();
+        //     // Logger.setReplaySource(new WPILOGReader(logPath));
+        //     // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        //     break;
+        // }
 
-        Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+        //Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         robot = new RobotContainer();
         alliance = Alliance.Blue;
