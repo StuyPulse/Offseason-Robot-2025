@@ -24,6 +24,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.Matrix;
@@ -57,8 +59,8 @@ public class ArmImpl extends Arm {
     private final double GRAVITY = 9.81;
 
     // Conversion Factors
-    private final double shoulderGearRatio = Constants.DoubleJointedArm.Shoulder.GEAR_RATIO;
-    private final double elbowGearRatio = Constants.DoubleJointedArm.Shoulder.GEAR_RATIO;
+    private final double shoulderGearRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
+    private final double elbowGearRatio = Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO;
     private final double TORQUE_TO_VOLTAGE = 1.0 / 12.0; // Converts Nm to volts
 
     private final PositionVoltage shoulderPositionReq = new PositionVoltage(0).withSlot(0);
@@ -71,11 +73,11 @@ public class ArmImpl extends Arm {
     // private int trajectoryIndex = 0;
 
     public ArmImpl() {
-        frontShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR);
-        backShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.BACK_MOTOR);
-        elbowMotor = new TalonFX(Ports.DoubleJointedArm.Elbow.MOTOR);
-        shoulderEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Shoulder.ENCODER);
-        elbowEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Elbow.ENCODER);
+        frontShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR, "CANIVORE");
+        backShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.BACK_MOTOR, "CANIVORE");
+        elbowMotor = new TalonFX(Ports.DoubleJointedArm.Elbow.MOTOR, "CANIVORE");
+        shoulderEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Shoulder.ENCODER, "CANIVORE");
+        elbowEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Elbow.ENCODER, "CANIVORE");
         
         mMatrix = new Matrix<>(Nat.N2(), Nat.N2());
         cMatrix = new Matrix<>(Nat.N2(), Nat.N2());
@@ -88,13 +90,6 @@ public class ArmImpl extends Arm {
         
         configureMotors();
 
-        shoulderEncoder.getConfigurator().apply(
-            new CANcoderConfiguration()
-            .withMagnetSensor(new MagnetSensorConfigs()
-            .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-            .withMagnetOffset(Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT)
-            .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Elbow.ENCODER_UPPER_LIMIT_ROT)));
-        
         // configSpace = new ArmConfigurationSpace();
         // pathPlanner = new ArmPathPlanner(configSpace);
     }
@@ -123,12 +118,12 @@ public class ArmImpl extends Arm {
                     .withKA(Settings.DoubleJointedArm.Elbow.FF.kA);
         
         // Maaster Motor Configuration
-        masterShoulderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        masterShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         masterShoulderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         frontShoulderMotor.getConfigurator().apply(masterShoulderConfig);
 
         // Follower Motor Configuration
-        followerShoulderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        followerShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         followerShoulderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         backShoulderMotor.getConfigurator().apply(followerShoulderConfig);
 
@@ -142,12 +137,12 @@ public class ArmImpl extends Arm {
 
     @Override
     public Rotation2d getShoulderAngle() {
-        return Rotation2d.fromRotations(shoulderEncoder.getAbsolutePosition().getValueAsDouble());
+        return Rotation2d.fromRotations(shoulderEncoder.getPosition().getValueAsDouble() * Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO + Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT);
     }
 
     @Override
     public Rotation2d getElbowAngle() {
-        return Rotation2d.fromRotations(elbowEncoder.getAbsolutePosition().getValueAsDouble());
+        return Rotation2d.fromRotations(elbowEncoder.getPosition().getValueAsDouble() * Constants.DoubleJointedArm.Elbow.ENCODER_GEAR_RATIO + Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT);
     }
 
     // Return 2x1 Matrix
@@ -165,10 +160,10 @@ public class ArmImpl extends Arm {
         Pair<Double, Double> AStream = new Pair<>(shoulderEncoder.getVelocity().getValueAsDouble() / timer.get(), 
                                                   elbowEncoder.getVelocity().getValueAsDouble() / timer.get());
 
-        timer.reset();
+        timer.restart();
 
-        aMatrix.set(0, 0, AStream.getSecond());
-        aMatrix.set(1, 0, AStream.getFirst());
+        aMatrix.set(0, 0, Math.max(AStream.getFirst() - 0.4, 0.0));
+        aMatrix.set(1, 0, Math.max(AStream.getSecond() - 0.4, 0.0));
 
         return aMatrix;
     }
@@ -321,8 +316,6 @@ public class ArmImpl extends Arm {
         return endPoint;
     }
 
-    
-
     @Override
     public void periodic() {
         // if (currentTrajectory != null && trajectoryIndex < currentTrajectory.size()) {
@@ -333,15 +326,22 @@ public class ArmImpl extends Arm {
         //     );
         // }
 
-        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Encoder Raw", shoulderEncoder.getPosition().getValueAsDouble());
-
         // Logging
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/End Height", getEndPosition().getY());
 
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Velocity", vMatrix.get(0, 0));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Velocity", vMatrix.get(1, 0));
+
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Acceleration", aMatrix.get(0, 0));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Acceleration", aMatrix.get(1, 0));
+
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Torque", calculateTorque().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Torque", calculateTorque().get(1, 0));
+
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", shoulderPositionReq.getFeedForwardMeasure().in(Units.Volts));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowPositionReq.getFeedForwardMeasure().in(Units.Volts));
 
         SmartDashboard.putNumber("DoubleJointedArm/Timer", timer.get());
     }

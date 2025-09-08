@@ -31,10 +31,10 @@ public interface Constants {
             double MASS = 0.51845608; // 1.143 lbs -> 0.51845608 kg
 
             double MOTOR_GEAR_RATIO = 3515.0 / 27.0; // Check
-            double ENCODER_GEAR_RATIO = 4.625 / 1;
+            double ENCODER_GEAR_RATIO = 1.0 / 4.625;
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
 
-            double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
+            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(2.1).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-90);
@@ -48,10 +48,10 @@ public interface Constants {
             double MASS = 0.39780051; // 0.877 lbs -> 0.39780051 kg
 
             double MOTOR_GEAR_RATIO = 3515.0 / 27.0;
-            double ENCODER_GEAR_RATIO = 3.0327 / 1; 
+            double ENCODER_GEAR_RATIO = 1.0 / 3.0327; 
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
     
-            double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0.0).getRotations();
+            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.83).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);
