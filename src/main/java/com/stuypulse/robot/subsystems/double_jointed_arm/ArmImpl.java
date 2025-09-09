@@ -63,7 +63,7 @@ public class ArmImpl extends Arm {
     private final double elbowGearRatio = Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO;
     private final double TORQUE_TO_VOLTAGE = 1.0 / 12.0; // Converts Nm to volts
 
-    private final PositionVoltage shoulderPositionReq = new PositionVoltage(0).withSlot(0);
+    private final PositionVoltage shoulderPositionReq = new PositionVoltage(.25).withSlot(0);
     private final PositionVoltage elbowPositionReq = new PositionVoltage(0).withSlot(1);
 
     // // Configuration Space + PathPlanner
@@ -156,14 +156,14 @@ public class ArmImpl extends Arm {
 
     // Return 2x1 Matrix
     public Matrix<N2, N1> getAccelerations(){
-        
-        Pair<Double, Double> AStream = new Pair<>(shoulderEncoder.getVelocity().getValueAsDouble() / timer.get(), 
-                                                  elbowEncoder.getVelocity().getValueAsDouble() / timer.get());
+
+        Pair<Double, Double> AStream = new Pair<>(frontShoulderMotor.getAcceleration().getValueAsDouble(), 
+                                                  elbowMotor.getAcceleration().getValueAsDouble());
 
         timer.restart();
 
-        aMatrix.set(0, 0, Math.max(AStream.getFirst() - 0.4, 0.0));
-        aMatrix.set(1, 0, Math.max(AStream.getSecond() - 0.4, 0.0));
+        aMatrix.set(0, 0, AStream.getFirst());
+        aMatrix.set(1, 0, AStream.getSecond());
 
         return aMatrix;
     }
@@ -242,9 +242,9 @@ public class ArmImpl extends Arm {
         Matrix<N2, N1> tau = calculateTorque();
         
         // Convert torque to volts (Need Gear Ratio)
-        double shoulderVolts = tau.get(0, 0) / (shoulderGearRatio * TORQUE_TO_VOLTAGE);
-        double elbowVolts = tau.get(1, 0) / (elbowGearRatio* TORQUE_TO_VOLTAGE);
-        
+        double shoulderVolts = tau.get(0, 0) / shoulderGearRatio * TORQUE_TO_VOLTAGE;
+        double elbowVolts = tau.get(1, 0) / elbowGearRatio * TORQUE_TO_VOLTAGE;
+
         // FeedForward
         frontShoulderMotor.setControl(
             shoulderPositionReq
@@ -326,6 +326,8 @@ public class ArmImpl extends Arm {
         //     );
         // }
 
+        setTargetAngles(getShoulderAngle(), getElbowAngle());
+        
         // Logging
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getRadians());
@@ -340,8 +342,10 @@ public class ArmImpl extends Arm {
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Torque", calculateTorque().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Torque", calculateTorque().get(1, 0));
 
-        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", shoulderPositionReq.getFeedForwardMeasure().in(Units.Volts));
-        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowPositionReq.getFeedForwardMeasure().in(Units.Volts));
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", frontShoulderMotor.getSupplyVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowMotor.getMotorVoltage().getValueAsDouble());
+
+        // SmartDashboard.putNumber("DoubleJointedArm/Shoulder target", frontShoulderMotor.)
 
         SmartDashboard.putNumber("DoubleJointedArm/Timer", timer.get());
     }
