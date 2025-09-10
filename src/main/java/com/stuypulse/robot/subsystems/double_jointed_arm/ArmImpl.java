@@ -1,7 +1,5 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
-import java.util.List;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -157,8 +155,8 @@ public class ArmImpl extends Arm {
     // Return 2x1 Matrix
     public Matrix<N2, N1> getAccelerations(){
 
-        Pair<Double, Double> AStream = new Pair<>(frontShoulderMotor.getAcceleration().getValueAsDouble(), 
-                                                  elbowMotor.getAcceleration().getValueAsDouble());
+        Pair<Double, Double> AStream = new Pair<>(frontShoulderMotor.getAcceleration().getValueAsDouble() * Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO, 
+                                                  elbowMotor.getAcceleration().getValueAsDouble() * Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO);
 
         timer.restart();
 
