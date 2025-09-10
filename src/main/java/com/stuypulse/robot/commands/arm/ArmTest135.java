@@ -1,17 +1,17 @@
-// package com.stuypulse.robot.commands;
+// package com.stuypulse.robot.commands.arm;
 
-// import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArm;
-// import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArm.ArmState;
+// import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
+// import com.stuypulse.robot.subsystems.double_jointed_arm.Arm.ArmState;
 
 // import edu.wpi.first.wpilibj2.command.Command;
 
-// public class ArmSetState extends Command {
-//     private DoubleJointedArm arm;
+// public class ArmTest135 extends Command {
+//     private Arm arm;
 //     private ArmState state;
 
-//     public ArmSetState(ArmState state) {
+//     public ArmUp90(ArmState state) {
 //         this.state = state;
-//         this.arm = DoubleJointedArm.getInstance();
+//         this.arm = Arm.getInstance();
 //         addRequirements(arm);
 //     }
 

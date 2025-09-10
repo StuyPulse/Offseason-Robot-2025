@@ -29,8 +29,9 @@ public abstract class Arm extends SubsystemBase{
     }
 
     public enum ArmState {
-        RESTING(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT));
-
+        STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
+        TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(135.0)),
+        TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-135.0));
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;
 
@@ -52,6 +53,18 @@ public abstract class Arm extends SubsystemBase{
         public Rotation2d getElbowTargetAngle(){
             return this.elbowTargetAngle;
         }
+
+        public boolean isFront() {
+        return this.name().endsWith("FRONT") || this.equals(ArmState.STOW);
+        }
+
+        public ArmState getOpposite() {
+            switch (this) {
+                case TEST_FRONT: return TEST_BACK;
+                case TEST_BACK: return TEST_FRONT;
+                default: return STOW;
+            }
+        }
     }
 
     private ArmState state;
@@ -60,14 +73,18 @@ public abstract class Arm extends SubsystemBase{
         return this.state;
     }
 
+
     public abstract Rotation2d getShoulderAngle();
     public abstract Rotation2d getElbowAngle();
     // public abstract void setTargetPosition(Translation2d target);
     public abstract Translation2d getEndPosition();
+    public abstract boolean atTargetElbowAngle();
+    public abstract boolean atTargetShoulderAngle();
     public abstract void setTargetAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle);
     public abstract Matrix<N2, N2> calculateMMatrix(); // Mass Intertia Matrix
     public abstract Matrix<N2, N2> calculateCMatrix(); // Centrifugal + Coriolis Matrix
     public abstract Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
+    // public abstract void switchSides();
     
 
     public void setState(ArmState state) {
