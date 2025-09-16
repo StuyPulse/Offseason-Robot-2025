@@ -42,7 +42,7 @@ public class ArmImpl extends Arm {
 
     private final Timer timer;
 
-    private boolean intermediate;
+    // private boolean intermediate;
 
     // Matricies
     private Matrix<N2, N2> mMatrix;

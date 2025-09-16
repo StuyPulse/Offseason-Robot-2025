@@ -17,7 +17,6 @@ public class ArmSetState extends Command {
 
     @Override
     public void initialize() {
-        
         arm.setState(state);
     }
 

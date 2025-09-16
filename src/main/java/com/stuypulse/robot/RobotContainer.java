@@ -5,7 +5,9 @@
 
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.arm.ArmTest45;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
+import com.stuypulse.robot.commands.auton.MoveArm;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
@@ -56,7 +58,7 @@ public class RobotContainer {
         //     //   roller = new Roller(new RollerIO() {});
         //       break;
         // }
-        
+
         configureDefaultCommands();
         configureButtonBindings();
         configureAutons();
@@ -72,11 +74,13 @@ public class RobotContainer {
 	/*** BUTTONS ***/
 	/***************/
 
-	private void configureButtonBindings() {}
+	private void configureButtonBindings() {
+        driver.getDPadRight().onTrue(new ArmTest45());
+    }
 
 	/**************/
 	/*** AUTONS ***/
-	/**************/
+	/**************/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 
 	public void configureAutons() {
 		autonChooser.setDefaultOption("Do Nothing", new DoNothingAuton());

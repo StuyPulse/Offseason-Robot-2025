@@ -14,6 +14,7 @@ import com.stuypulse.robot.constants.Constants;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +53,8 @@ public class Robot extends TimedRobot {
         // }
 
         //Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
+        
 
         robot = new RobotContainer();
         alliance = Alliance.Blue;
@@ -99,6 +102,8 @@ public class Robot extends TimedRobot {
         if (auto != null) {
             auto.schedule();
         }
+
+        Shuffleboard.selectTab("Autonomous");
     }
 
     @Override
