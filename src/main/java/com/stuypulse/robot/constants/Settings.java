@@ -47,7 +47,7 @@ public interface Settings {
         
         public interface Elbow {
 
-            double DEFAULT = 90.0;
+            double DEFAULT = 0.0;
             double L2 = 0.0;
             double L3 = 0.0;
             double L4 = 0.0;

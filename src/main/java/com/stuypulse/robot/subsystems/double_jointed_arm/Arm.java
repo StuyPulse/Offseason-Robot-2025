@@ -67,12 +67,17 @@ public abstract class Arm extends SubsystemBase{
         }
     }
 
-    private ArmState state;
+    private ArmState state; 
+
+    protected Arm() {
+        this.state = ArmState.STOW; // initalize to avoid NULL POINTER EXCEPTIOn
+    }
 
     public ArmState getState(){
         return this.state;
     }
 
+    
 
     public abstract Rotation2d getShoulderAngle();
     public abstract Rotation2d getElbowAngle();
@@ -96,6 +101,6 @@ public abstract class Arm extends SubsystemBase{
 
     @Override
     public void periodic() {
-
+        
     }
 }

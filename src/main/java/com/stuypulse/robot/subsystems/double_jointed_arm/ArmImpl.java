@@ -350,9 +350,9 @@ public class ArmImpl extends Arm {
         //     );
         // }
 
-        setTargetAngles(getShoulderAngle(), getElbowAngle());
-        
+        setTargetAngles(getState().getShoulderTargetAngle(), getState().getElbowTargetAngle());
         // Logging
+        SmartDashboard.putString("DoubleJointedArm/State", getState().toString());
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/End Height", getEndPosition().getY());
