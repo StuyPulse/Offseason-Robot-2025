@@ -59,6 +59,7 @@ public interface Constants {
     }
 
     public interface Wrist {
+        double MASS = 2.26796; // 5 lbs -> 2.26796 kg
         double GEAR_RATIO = 1/1;
         double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0).getRotations();
     }

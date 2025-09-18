@@ -58,7 +58,7 @@ public class ArmImpl extends Arm {
 
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;       // kg
-    private final double elbowMass = Constants.DoubleJointedArm.Elbow.MASS;             // kg
+    private final double elbowMass = Constants.DoubleJointedArm.Elbow.MASS + Constants.Wrist.MASS;             // kg
     private final double shoulderLength = Constants.DoubleJointedArm.Shoulder.LENGTH;   // m
     private final double elbowLength = Constants.DoubleJointedArm.Elbow.LENGTH;         // m
     private final double GRAVITY = 9.81;
@@ -388,6 +388,9 @@ public class ArmImpl extends Arm {
 
         // Logging
         SmartDashboard.putString("DoubleJointedArm/State", getState().toString());
+        SmartDashboard.putNumber("DoubleJointedArm/Target Shoulder Angle", getState().getShoulderTargetAngle().getDegrees());
+        SmartDashboard.putNumber("DoubleJointedArm/Target Elbow Angle", getState().getElbowTargetAngle().getDegrees());
+
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getRadians());
         SmartDashboard.putNumber("DoubleJointedArm/End Height", getEndPosition().getY());

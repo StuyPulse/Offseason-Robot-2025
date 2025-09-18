@@ -43,26 +43,26 @@ public interface Devices {
             TalonFXConfig motor_config = new TalonFXConfig()
                 .withCurrentLimitAmps(80)
                 .withRampRate(0.25)
-                .withNeutralMode(NeutralModeValue.Brake)
+                .withNeutralMode(NeutralModeValue.Coast)
                 .withInvertedValue(InvertedValue.CounterClockwise_Positive)
-                .withPIDConstants(0, 0, 0, 0)
-                .withFFConstants(0, 0, 0, 0)
+                .withPIDConstants(0.15744, 0, 0.015, 0)
+                .withFFConstants(0.2272, 0.9590, 0.15361, 0.8, 0)
                 .withGravityType(GravityTypeValue.Arm_Cosine)
-                .withSensorToMechanismRatio(0)
+                .withSensorToMechanismRatio(Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO)
                 .withRemoteSensor(Ports.DoubleJointedArm.Shoulder.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
-                .withMotionProfile(0, 0);
+                .withMotionProfile(10, 10);
 
             TalonFXConfig motor_followerConfig = new TalonFXConfig()
                     .withCurrentLimitAmps(80)
                     .withRampRate(0.25)
-                    .withNeutralMode(NeutralModeValue.Brake)
+                    .withNeutralMode(NeutralModeValue.Coast)
                     .withInvertedValue(InvertedValue.CounterClockwise_Positive)
-                    .withPIDConstants(0, 0, 0, 0)
-                    .withFFConstants(0, 0, 0, 0)
+                    .withPIDConstants(0.15744, 0, 0.015, 0)
+                    .withFFConstants(0.2272, 0.9590, 0.15361, 0.8, 0)
                     .withGravityType(GravityTypeValue.Arm_Cosine)
-                    .withSensorToMechanismRatio(0)
+                    .withSensorToMechanismRatio(Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO)
                     .withRemoteSensor(Ports.DoubleJointedArm.Shoulder.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
-                    .withMotionProfile(0, 0);
+                    .withMotionProfile(10, 10);
 
             CANcoderConfiguration cc_config = new CANcoderConfiguration()
             .withMagnetSensor(

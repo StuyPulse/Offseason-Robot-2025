@@ -29,7 +29,7 @@ public abstract class Arm extends SubsystemBase{
 
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
-        TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(45.0)),
+        TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(0.0)),
         TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-135.0));
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;
