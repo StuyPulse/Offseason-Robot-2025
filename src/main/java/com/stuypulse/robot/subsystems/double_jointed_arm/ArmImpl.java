@@ -54,6 +54,7 @@ public class ArmImpl extends Arm {
 
     private Matrix<N2, N2> kBMatrix;
     private Matrix<N2, N2> BMatrix;
+    private Matrix<N2, N1> uMatrix;
 
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;       // kg
@@ -95,6 +96,7 @@ public class ArmImpl extends Arm {
 
         kBMatrix = new Matrix<>(Nat.N2(), Nat.N2());
         BMatrix = new Matrix<>(Nat.N2(), Nat.N2());
+        uMatrix = new Matrix<>(Nat.N2(), Nat.N1());
 
         timer =  new Timer();
         
@@ -358,7 +360,8 @@ public class ArmImpl extends Arm {
 
     @Override
     public void periodic() {
-
+        calculateBackEmf();
+        calculateMotorTorque();
 
         // if (currentTrajectory != null && trajectoryIndex < currentTrajectory.size()) {
         //     DoubleJointedArmSpline.DoubleJointedArmTrajectoryPoint setpoint = currentTrajectory.get(trajectoryIndex++);
@@ -398,9 +401,11 @@ public class ArmImpl extends Arm {
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Torque", calculateTorque().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Torque", calculateTorque().get(1, 0));
 
-        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", frontShoulderMotor.getSupplyVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowMotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", calculateVoltage().get(0,0));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", calculateVoltage().get(1,0));
 
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder MT", BMatrix.inv().get(0, 0));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow MT", BMatrix.inv().get(1,1));
         SmartDashboard.putNumber("DoubleJointedArm/Timer", timer.get());
     }
 }
