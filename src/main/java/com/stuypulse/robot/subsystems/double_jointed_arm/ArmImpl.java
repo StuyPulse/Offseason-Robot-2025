@@ -279,26 +279,6 @@ public class ArmImpl extends Arm {
     }
 
     @Override
-    public void setTargetAngles(Rotation2d shoulder, Rotation2d elbow) {
-    
-        double shoulderVolts = calculateVoltage().get(0, 0);
-        double elbowVolts = calculateVoltage().get(1, 0);
-
-        // FeedForward
-        frontShoulderMotor.setControl(
-            shoulderPositionReq
-                .withPosition(shoulder.getRotations())
-                .withFeedForward(shoulderVolts)
-        );
-        
-        elbowMotor.setControl(
-            elbowPositionReq
-                .withPosition(elbow.getRotations())
-                .withFeedForward(elbowVolts)
-        );
-    }
-
-    @Override
     public boolean atTargetElbowAngle(){
         double targetAngle = getState().getElbowTargetAngle().getRadians();
         return (Math.abs(targetAngle - getElbowAngle().getRadians()) == Settings.DoubleJointedArm.Elbow.TOLERANCE);
@@ -388,7 +368,21 @@ public class ArmImpl extends Arm {
         //     );
         // }
 
-        setTargetAngles(getState().getShoulderTargetAngle(), getState().getElbowTargetAngle());
+        double shoulderVolts = calculateVoltage().get(0, 0);
+        double elbowVolts = calculateVoltage().get(1, 0);
+
+        frontShoulderMotor.setControl(
+            shoulderPositionReq
+                .withPosition(getState().getShoulderTargetAngle().getRotations())
+                .withFeedForward(shoulderVolts)
+        );
+        
+        elbowMotor.setControl(
+            elbowPositionReq
+                .withPosition(getState().getElbowTargetAngle().getRotations())
+                .withFeedForward(elbowVolts)
+        );
+
         // Logging
         SmartDashboard.putString("DoubleJointedArm/State", getState().toString());
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());

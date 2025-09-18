@@ -85,7 +85,6 @@ public abstract class Arm extends SubsystemBase{
     public abstract Translation2d getEndPosition();
     public abstract boolean atTargetElbowAngle();
     public abstract boolean atTargetShoulderAngle();
-    public abstract void setTargetAngles(Rotation2d shoulderAngle, Rotation2d elbowAngle);
     public abstract Matrix<N2, N2> calculateMMatrix(); // Mass Intertia Matrix
     public abstract Matrix<N2, N2> calculateCMatrix(); // Centrifugal + Coriolis Matrix
     public abstract Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
