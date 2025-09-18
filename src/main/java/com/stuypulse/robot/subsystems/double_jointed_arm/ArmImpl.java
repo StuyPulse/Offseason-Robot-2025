@@ -52,6 +52,9 @@ public class ArmImpl extends Arm {
     private Matrix<N2, N1> vMatrix;
     private Matrix<N2, N1> aMatrix;
 
+    private Matrix<N2, N2> kBMatrix;
+    private Matrix<N2, N2> BMatrix;
+
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;       // kg
     private final double elbowMass = Constants.DoubleJointedArm.Elbow.MASS;             // kg
@@ -59,10 +62,13 @@ public class ArmImpl extends Arm {
     private final double elbowLength = Constants.DoubleJointedArm.Elbow.LENGTH;         // m
     private final double GRAVITY = 9.81;
 
+    private final double kT = 7.09 / 366.0;  // Stall torque / Stall current
+    private final double kU = 6000.0 / 12.0; // Free speed / Volts
+    private final double r = 12.0 / 366.0;   // Volts / Stall current
+
     // Conversion Factors
     private final double shoulderGearRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
     private final double elbowGearRatio = Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO;
-    private final double TORQUE_TO_VOLTAGE = 1.0 / 12.0; // Converts N*m to volts
 
     private final PositionVoltage shoulderPositionReq = new PositionVoltage(.25).withSlot(0);
     private final PositionVoltage elbowPositionReq = new PositionVoltage(0).withSlot(1);
@@ -86,6 +92,9 @@ public class ArmImpl extends Arm {
 
         vMatrix = new Matrix<>(Nat.N2(), Nat.N1());
         aMatrix = new Matrix<>(Nat.N2(), Nat.N1());
+
+        kBMatrix = new Matrix<>(Nat.N2(), Nat.N2());
+        BMatrix = new Matrix<>(Nat.N2(), Nat.N2());
 
         timer =  new Timer();
         
@@ -158,10 +167,9 @@ public class ArmImpl extends Arm {
     // Return 2x1 Matrix
     public Matrix<N2, N1> getAccelerations(){
 
-        Pair<Double, Double> AStream = new Pair<>(new Rotation2d(frontShoulderMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO), 
-                                                  new Rotation2d(elbowMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO));
+        Pair<Double, Double> AStream = new Pair<>(new Rotation2d(frontShoulderMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / shoulderGearRatio), 
+                                                  new Rotation2d(elbowMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / elbowGearRatio));
 
-        timer.restart();
 
         aMatrix.set(0, 0, AStream.getFirst());
         aMatrix.set(1, 0, AStream.getSecond());
@@ -228,6 +236,7 @@ public class ArmImpl extends Arm {
         return gMatrix;
     }
 
+    @Override
     public Matrix<N2, N1> calculateTorque() {
         Matrix<N2, N1> velocities = getVelocities();
         Matrix<N2, N1> accelerations = getAccelerations();
@@ -239,12 +248,41 @@ public class ArmImpl extends Arm {
     }
 
     @Override
+    public Matrix<N2, N2> calculateBackEmf() {
+        double kB0_0 = (Math.pow(shoulderGearRatio, 2) * 2.0 * kT) / (kU * r);
+        double kB1_1 = (Math.pow(elbowGearRatio, 2) * 1.0 * kT) / (kU * r);
+
+        kBMatrix.set(0, 0, kB0_0);
+        kBMatrix.set(0, 1, 0.0);
+        kBMatrix.set(1, 0, 0.0);
+        kBMatrix.set(1, 1, kB1_1);
+
+        return kBMatrix;
+    }
+
+    @Override
+    public Matrix<N2, N2> calculateMotorTorque() {
+        double B0_0 = shoulderGearRatio * 2.0 * kT / r;
+        double B1_1 = elbowGearRatio * 1.0 * kT / r;
+
+        BMatrix.set(0, 0, B0_0);
+        BMatrix.set(0, 1, 0.0);
+        BMatrix.set(1, 0, 0.0);
+        BMatrix.set(1, 1, B1_1);
+
+        return BMatrix;
+    }
+
+    @Override 
+    public Matrix<N2, N1> calculateVoltage() {
+        return BMatrix.inv().times(calculateTorque().plus(kBMatrix.times(vMatrix)));
+    }
+
+    @Override
     public void setTargetAngles(Rotation2d shoulder, Rotation2d elbow) {
-        Matrix<N2, N1> tau = calculateTorque();
-        
-        // Convert torque to volts (Need Gear Ratio)
-        double shoulderVolts = tau.get(0, 0) / shoulderGearRatio * TORQUE_TO_VOLTAGE;
-        double elbowVolts = tau.get(1, 0) / elbowGearRatio * TORQUE_TO_VOLTAGE;
+    
+        double shoulderVolts = calculateVoltage().get(0, 0);
+        double elbowVolts = calculateVoltage().get(1, 0);
 
         // FeedForward
         frontShoulderMotor.setControl(

@@ -89,6 +89,10 @@ public abstract class Arm extends SubsystemBase{
     public abstract Matrix<N2, N2> calculateMMatrix(); // Mass Intertia Matrix
     public abstract Matrix<N2, N2> calculateCMatrix(); // Centrifugal + Coriolis Matrix
     public abstract Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
+    public abstract Matrix<N2, N1> calculateTorque();
+    public abstract Matrix<N2, N2> calculateBackEmf();
+    public abstract Matrix<N2, N2> calculateMotorTorque();
+    public abstract Matrix<N2, N1> calculateVoltage();
     // public abstract void switchSides();
     
 
