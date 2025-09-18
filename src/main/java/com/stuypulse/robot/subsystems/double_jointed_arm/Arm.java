@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class Arm extends SubsystemBase{
@@ -96,10 +95,7 @@ public abstract class Arm extends SubsystemBase{
     
 
     public void setState(ArmState state) {
-        setGoal(state.getShoulderTargetAngle().getDegrees(), state.getShoulderTargetAngle().getDegrees());
-    }
-
-    protected void setGoal(double shoulderDegrees, double elbowDegrees) {
+        this.state = state;
     }
 
     @Override
