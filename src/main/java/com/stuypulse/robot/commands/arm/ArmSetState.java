@@ -3,9 +3,9 @@ package com.stuypulse.robot.commands.arm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm.ArmState;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-public class ArmSetState extends Command {
+public class ArmSetState extends InstantCommand {
     private Arm arm;
     private ArmState state;
 
