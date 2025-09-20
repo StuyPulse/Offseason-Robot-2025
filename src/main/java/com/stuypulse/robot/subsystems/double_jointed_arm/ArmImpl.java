@@ -1,35 +1,28 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.constants.Settings;
-import com.stuypulse.stuylib.math.SLMath;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Pair;
 
 public class ArmImpl extends Arm {
     // Hardware
@@ -184,6 +177,11 @@ public class ArmImpl extends Arm {
         double c2 = Math.cos(getElbowAngle().getRadians());
         
         // Moment of inertia (can be pre determined)
+        //alex comments -> Moment of Inertia is essentially how resistant an object is to changes in its rotation.
+        //the same way that mass is a measure of how much an object resists changes in its linear motion.
+        //higher moment of inertia means it's harder to change the rotational speed of the object
+        // for a rod rotating about one end: I = (1/3) * m * L^2 -> becomes lower if rotating about center of mass
+
         // 1/3 mass * length^2
         double I1 = shoulderMass * Math.pow(shoulderLength, 2) / 3.0; 
         double I2 = elbowMass * Math.pow(elbowLength, 2) / 3.0;
@@ -192,12 +190,15 @@ public class ArmImpl extends Arm {
                     + elbowMass * (Math.pow(shoulderLength, 2) + Math.pow(elbowLength/2.0, 2))
                     + I1 + I2 
                     + 2.0 * elbowMass * shoulderLength * (elbowLength/2.0) * c2;
+        //calculate the inertia of the shoulder joint
         
         double m0_1 = elbowMass * Math.pow(elbowLength/2.0, 2) 
                     + I2 
                     + elbowMass * shoulderLength * (elbowLength/2.0) * c2;
+        //calculate the inertia of the elbow joint affects the shoulder joint
 
         double m1_1 = elbowMass * Math.pow(elbowLength/2.0, 2) + I2;
+        //calculate inertia of the elbow joint
         
         // M is symmetric
         mMatrix.set(0, 0, m0_0);
@@ -228,8 +229,8 @@ public class ArmImpl extends Arm {
 
     @Override
     public Matrix <N2, N1> calculateGMatrix(){
-        double g0_0 = (shoulderMass * (shoulderLength / 2.0) + elbowLength * shoulderLength) * GRAVITY * Math.cos(getShoulderAngle().getRadians()
-                        + elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getShoulderAngle().getRadians() + getElbowAngle().getRadians()));
+        double g0_0 = (shoulderMass * (shoulderLength / 2.0) + elbowLength * shoulderLength) * GRAVITY * Math.cos(getShoulderAngle().getRadians())
+                        + elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getShoulderAngle().getRadians() + getElbowAngle().getRadians());
         double g1_0 = (elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getShoulderAngle().getRadians() + getElbowAngle().getRadians()));
         
         gMatrix.set(0, 0, g0_0);
