@@ -17,7 +17,11 @@ public class ArmSetState extends InstantCommand {
 
     @Override
     public void initialize() {
-        arm.setState(state);
+        if (arm.getState().isFront() != state.isFront()) {
+            arm.switchSides(state);
+        } else {
+            arm.setState(state);
+        }
     }
 
     @Override

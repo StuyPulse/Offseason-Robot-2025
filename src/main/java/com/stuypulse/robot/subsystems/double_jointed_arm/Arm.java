@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public abstract class Arm extends SubsystemBase{
     public static final Arm instance;
 
+    private boolean intermediate;
+    private ArmState storedState;
+
     static {
         if (Robot.isReal()){
             instance = new ArmImpl();
@@ -30,7 +33,9 @@ public abstract class Arm extends SubsystemBase{
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
         TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(0.0)),
-        TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-135.0));
+        TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-135.0)),
+        INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90));
+        
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;
 
@@ -69,21 +74,31 @@ public abstract class Arm extends SubsystemBase{
     private ArmState state; 
 
     protected Arm() {
-        this.state = ArmState.STOW; // initalize to avoid NULL POINTER EXCEPTIOn
+        this.state = ArmState.STOW;
+        this.storedState = ArmState.STOW;
+        this.intermediate = false;
     }
 
     public ArmState getState(){
         return this.state;
     }
 
-    
+    public void switchSides(ArmState endState) { 
+        if (!intermediate) {
+            intermediate = true;
+            storedState = endState;
+            setState(ArmState.INT);
+        }
+    }
 
     public abstract Rotation2d getShoulderAngle();
     public abstract Rotation2d getElbowAngle();
-    // public abstract void setTargetPosition(Translation2d target);
+
     public abstract Translation2d getEndPosition();
+
     public abstract boolean atTargetElbowAngle();
     public abstract boolean atTargetShoulderAngle();
+
     public abstract Matrix<N2, N2> calculateMMatrix(); // Mass Intertia Matrix
     public abstract Matrix<N2, N2> calculateCMatrix(); // Centrifugal + Coriolis Matrix
     public abstract Matrix<N2, N1> calculateGMatrix(); // Torque due to Gravity Matrix
@@ -91,7 +106,6 @@ public abstract class Arm extends SubsystemBase{
     public abstract Matrix<N2, N2> calculateBackEmf();
     public abstract Matrix<N2, N2> calculateMotorTorque();
     public abstract Matrix<N2, N1> calculateVoltage();
-    // public abstract void switchSides();
     
 
     public void setState(ArmState state) {
@@ -100,6 +114,9 @@ public abstract class Arm extends SubsystemBase{
 
     @Override
     public void periodic() {
-        
+        if (intermediate && atTargetShoulderAngle() && atTargetElbowAngle()) {
+            setState(storedState);
+            intermediate = false;
+        }
     }
 }

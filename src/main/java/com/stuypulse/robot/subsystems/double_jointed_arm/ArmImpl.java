@@ -35,8 +35,6 @@ public class ArmImpl extends Arm {
 
     private final Timer timer;
 
-    // private boolean intermediate;
-
     // Matricies
     private Matrix<N2, N2> mMatrix;
     private Matrix<N2, N2> cMatrix;
@@ -67,12 +65,6 @@ public class ArmImpl extends Arm {
     private final PositionVoltage shoulderPositionReq = new PositionVoltage(.25).withSlot(0);
     private final PositionVoltage elbowPositionReq = new PositionVoltage(0).withSlot(1);
 
-    // // Configuration Space + PathPlanner
-    // private final ArmConfigurationSpace configSpace; 
-    // private final ArmPathPlanner pathPlanner;
-    // private List<ArmSpline.ArmTrajectoryPoint> currentTrajectory;
-    // private int trajectoryIndex = 0;
-
     public ArmImpl() {
         frontShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR, "CANIVORE");
         backShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.BACK_MOTOR, "CANIVORE");
@@ -80,6 +72,8 @@ public class ArmImpl extends Arm {
         shoulderEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Shoulder.ENCODER, "CANIVORE");
         elbowEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Elbow.ENCODER, "CANIVORE");
         
+
+
         mMatrix = new Matrix<>(Nat.N2(), Nat.N2());
         cMatrix = new Matrix<>(Nat.N2(), Nat.N2());
         gMatrix = new Matrix<>(Nat.N2(), Nat.N1());
@@ -94,9 +88,6 @@ public class ArmImpl extends Arm {
         timer =  new Timer();
         
         configureMotors();
-
-        // configSpace = new ArmConfigurationSpace();
-        // pathPlanner = new ArmPathPlanner(configSpace);
     }
 
     private void configureMotors() {
@@ -293,60 +284,6 @@ public class ArmImpl extends Arm {
         return (Math.abs(targetAngle - getShoulderAngle().getRadians()) == Settings.DoubleJointedArm.Shoulder.TOLERANCE);
     }
 
-    // @Override
-    //     public void switchSides() { 
-    //     if (!intermediate) {
-    //         intermediate = true;
-    //         storedState = getState().getOpposite();
-    //         setState(ArmState.INT);
-    //     }
-    // }
-
-    // private double[] calculateInverseKinematics(double x, double y) {
-    //     double d = Math.sqrt(x*x + y*y);
-    //     if (d > shoulderLength + elbowLength || d < Math.abs(shoulderLength - elbowLength)) {
-    //         return null; 
-    //     }
-        
-    //     double theta2 = Math.acos((x*x + y*y - shoulderLength*shoulderLength - elbowLength*elbowLength) 
-    //                     / (2 * shoulderLength * elbowLength));
-    //     double theta1 = Math.atan2(y, x) - Math.atan2(elbowLength * Math.sin(theta2), 
-    //                                         shoulderLength + elbowLength * Math.cos(theta2));
-        
-    //     return new double[]{theta1, theta2};
-    // }
-
-    // @Override
-    // public void setTargetPosition(Translation2d target) {
-    //     // Convert target to joint angles
-    //     double[] targetAngles = calculateInverseKinematics(target.getX(), target.getY());
-    //     if (targetAngles == null) return; 
-
-    //     // Plan path
-    //     List<Translation2d> path = pathPlanner.findPath(
-    //         getShoulderAngle(),
-    //         getElbowAngle(),
-    //         new Rotation2d(targetAngles[0]),
-    //         new Rotation2d(targetAngles[1])
-    //     );
-
-    //     // Generate trajectory
-    //     currentTrajectory = new DoubleJointedArmSpline(
-    //         new double[]{
-    //             getShoulderAngle().getRadians(),
-    //             getElbowAngle().getRadians()
-    //         },
-    //         new double[]{0, 0}, // Start velocity
-    //         new double[]{0, 0}, // Start acceleration
-    //         targetAngles,
-    //         new double[]{0, 0}, // End velocity
-    //         new double[]{0, 0}, // End acceleration
-    //         2.0     // Duration
-    //     ).sampleTrajectory(50);
-        
-    //     trajectoryIndex = 0;
-    // }
-
     @Override
     public Translation2d getEndPosition() {
         Rotation2d shoulder = getShoulderAngle();
@@ -363,14 +300,6 @@ public class ArmImpl extends Arm {
     public void periodic() {
         calculateBackEmf();
         calculateMotorTorque();
-
-        // if (currentTrajectory != null && trajectoryIndex < currentTrajectory.size()) {
-        //     DoubleJointedArmSpline.DoubleJointedArmTrajectoryPoint setpoint = currentTrajectory.get(trajectoryIndex++);
-        //     setTargetAngles(
-        //         Rotation2d.fromRadians(setpoint.theta1),
-        //         Rotation2d.fromRadians(setpoint.theta2)
-        //     );
-        // }
 
         double shoulderVolts = calculateVoltage().get(0, 0);
         double elbowVolts = calculateVoltage().get(1, 0);
