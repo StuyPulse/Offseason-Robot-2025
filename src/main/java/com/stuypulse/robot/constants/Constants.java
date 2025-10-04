@@ -39,6 +39,9 @@ public interface Constants {
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-90);
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(90);
+
+            double maxVeloctiy = Math.toRadians(360); // rad/s
+            double maxAcceleration = Math.toRadians(720); // rad/s^2
             
         }
 
@@ -55,6 +58,9 @@ public interface Constants {
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
+
+            double maxVeloctiy = Math.toRadians(360); // rad/s
+            double maxAcceleration = Math.toRadians(720); // rad/s^2
         }
     }
 

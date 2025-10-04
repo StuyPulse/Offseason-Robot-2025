@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.stuypulse.robot.constants.Constants;
+import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.constants.Settings;
 
@@ -21,6 +22,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -48,6 +51,15 @@ public class ArmImpl extends Arm {
     private Matrix<N2, N2> kBMatrix;
     private Matrix<N2, N2> BMatrix;
     private Matrix<N2, N1> uMatrix;
+
+    //Motion Profile
+    private TrapezoidProfile shoulderProfile;
+    private TrapezoidProfile.State currentShoulderState;
+    private TrapezoidProfile.State targetShoulderState;
+    private double lastTargetShoulderAccel; // this should be next accel
+    private TrapezoidProfile elbowProfile;
+    private TrapezoidProfile.State currentElbowState;
+    private double lastTargetElbowAccel;
 
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;       // kg
@@ -79,6 +91,13 @@ public class ArmImpl extends Arm {
         elbowMotor = new TalonFX(Ports.DoubleJointedArm.Elbow.MOTOR, "CANIVORE");
         shoulderEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Shoulder.ENCODER, "CANIVORE");
         elbowEncoder = new CoreCANcoder(Ports.DoubleJointedArm.Elbow.ENCODER, "CANIVORE");
+
+        shoulderProfile = new TrapezoidProfile(new Constraints(Constants.DoubleJointedArm.Shoulder.maxVeloctiy, Constants.DoubleJointedArm.Shoulder.maxAcceleration));
+        currentShoulderState = new TrapezoidProfile.State(getShoulderAngle().getRadians(), 0);
+        targetShoulderState =  new TrapezoidProfile.State(getState().getShoulderTargetAngle().getRadians(), 0);
+        lastTargetShoulderAccel = 0;
+        elbowProfile = new TrapezoidProfile(new Constraints(Constants.DoubleJointedArm.Elbow.maxVeloctiy, Constants.DoubleJointedArm.Elbow.maxAcceleration));
+        lastTargetElbowAccel = 0;
         
         mMatrix = new Matrix<>(Nat.N2(), Nat.N2());
         cMatrix = new Matrix<>(Nat.N2(), Nat.N2());
@@ -123,14 +142,16 @@ public class ArmImpl extends Arm {
                     .withKA(Settings.DoubleJointedArm.Elbow.FF.kA);
         
         // Maaster Motor Configuration
-        masterShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        masterShoulderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        frontShoulderMotor.getConfigurator().apply(masterShoulderConfig);
+        // masterShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // frontShoulderMotor.getConfigurator().apply(masterShoulderConfig);
 
-        // Follower Motor Configuration
-        followerShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        followerShoulderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        backShoulderMotor.getConfigurator().apply(followerShoulderConfig);
+        // // Follower Motor Configuration
+        // followerShoulderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // backShoulderMotor.getConfigurator().apply(Devices.DoubleJointedArm.Shoulder.motor_followerConfig);
+        
+        Devices.DoubleJointedArm.Shoulder.motor_config.configure(frontShoulderMotor);
+        Devices.DoubleJointedArm.Shoulder.motor_followerConfig.configure(backShoulderMotor);
+        Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
 
         backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
 
@@ -230,8 +251,8 @@ public class ArmImpl extends Arm {
     @Override
     public Matrix <N2, N1> calculateGMatrix(){
         double g0_0 = (shoulderMass * (shoulderLength / 2.0) + elbowLength * shoulderLength) * GRAVITY * Math.cos(getShoulderAngle().getRadians())
-                        + elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getShoulderAngle().getRadians() + getElbowAngle().getRadians());
-        double g1_0 = (elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getShoulderAngle().getRadians() + getElbowAngle().getRadians()));
+                        + elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getState().getShoulderTargetAngle().getRadians() + getState().getElbowTargetAngle().getRadians());
+        double g1_0 = (elbowMass * (elbowLength / 2.0) * GRAVITY * Math.cos(getState().getShoulderTargetAngle().getRadians() + getState().getElbowTargetAngle().getRadians()));
         
         gMatrix.set(0, 0, g0_0);
         gMatrix.set(1, 0, g1_0);
@@ -241,8 +262,8 @@ public class ArmImpl extends Arm {
 
     @Override
     public Matrix<N2, N1> calculateTorque() {
-        Matrix<N2, N1> velocities = getVelocities();
-        Matrix<N2, N1> accelerations = getAccelerations();
+        Matrix<N2, N1> velocities = new Matrix<>(Nat.N2(), Nat.N1());
+        Matrix<N2, N1> accelerations = new Matrix<>(Nat.N2(), Nat.N1());
         
         // M*accel + C*vel + G
         return calculateMMatrix().times(accelerations)
@@ -361,6 +382,11 @@ public class ArmImpl extends Arm {
 
     @Override
     public void periodic() {
+        
+        targetShoulderState = shoulderProfile.calculate(0.02, currentShoulderState, targetShoulderState);
+        lastTargetShoulderAccel = (targetShoulderState.velocity - currentShoulderState.velocity) / 0.02;
+
+        calculateTorque();
         calculateBackEmf();
         calculateMotorTorque();
 
