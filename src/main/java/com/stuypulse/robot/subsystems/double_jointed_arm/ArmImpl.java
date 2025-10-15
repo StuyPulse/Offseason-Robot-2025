@@ -1,6 +1,5 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
@@ -11,7 +10,6 @@ import com.stuypulse.robot.constants.Settings;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -93,12 +91,12 @@ public class ArmImpl extends Arm {
 
     private void configureMotors() {
         Devices.DoubleJointedArm.Shoulder.motor_config.configure(frontShoulderMotor);
-        Devices.DoubleJointedArm.Shoulder.motor_followerConfig.configure(backShoulderMotor);
-        Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
+        // Devices.DoubleJointedArm.Shoulder.motor_followerConfig.configure(backShoulderMotor);
+        // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
 
-        backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
+        // backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
 
-        Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
+        // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
     }
 
     @Override
@@ -207,15 +205,19 @@ public class ArmImpl extends Arm {
         SmartDashboard.putNumber("DoubleJointedArm/Target Shoulder Angle", getState().getShoulderTargetAngle().getDegrees());
         SmartDashboard.putNumber("DoubleJointedArm/Target Elbow Angle", getState().getElbowTargetAngle().getDegrees());
 
-        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getRadians());
-        SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getRadians());
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getDegrees());
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getDegrees());
         SmartDashboard.putNumber("DoubleJointedArm/End Height", getEndPosition().getY());
 
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Velocity", getVelocities().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Velocity", getVelocities().get(1, 0));
 
-        // SmartDashboard.putNumber("DoubleJointedArm/Shoulder Acceleration", getAccelerations().get(0, 0));
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder debug accel", frontShoulderMotor.getVelocity().getValueAsDouble()/0.02);
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Acceleration", getAccelerations().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Acceleration", getAccelerations().get(1, 0));
+
+        SmartDashboard.putNumber("DoubleJointedArm/shoulder cancoder debugging", shoulderEncoder.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("DoubleJointedArm/shoulder motor debugging", frontShoulderMotor.getPosition().getValueAsDouble());
 
         // SmartDashboard.putNumber("DoubleJointedArm/Shoulder Torque", calculateTorque().get(0, 0));
         // SmartDashboard.putNumber("DoubleJointedArm/Elbow Torque", calculateTorque().get(1, 0));
@@ -238,14 +240,10 @@ public class ArmImpl extends Arm {
     }
     
     // Return 2x1 Matrix
-    public Matrix<N2, N1> getAccelerations(){
+    public Matrix<N2, N1> getAccelerations() {
 
-        Pair<Double, Double> AStream = new Pair<>(new Rotation2d(frontShoulderMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / shoulderGearRatio), 
-                                                    new Rotation2d(elbowMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / elbowGearRatio));
-
-
-        aMatrix.set(0, 0, AStream.getFirst());
-        aMatrix.set(1, 0, AStream.getSecond());
+        aMatrix.set(0, 0, new Rotation2d(frontShoulderMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / shoulderGearRatio));
+        aMatrix.set(1, 0, new Rotation2d(elbowMotor.getAcceleration().getValueAsDouble()).getRadians() * (1.0 / elbowGearRatio));
 
         return aMatrix;
     }
