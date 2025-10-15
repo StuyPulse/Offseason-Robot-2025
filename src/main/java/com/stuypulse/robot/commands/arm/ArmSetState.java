@@ -3,29 +3,29 @@ package com.stuypulse.robot.commands.arm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm.ArmState;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class ArmSetState extends InstantCommand {
+public class ArmSetState extends Command {
     private Arm arm;
-    private ArmState state;
+    private ArmState targetState;
 
-    public ArmSetState(ArmState state) {
-        this.state = state;
+    public ArmSetState(ArmState targetState) {
+        this.targetState = targetState;
         this.arm = Arm.getInstance();
         addRequirements(arm);
     }
 
     @Override
     public void initialize() {
-        if (arm.getState().isFront() != state.isFront()) {
-            arm.switchSides(state);
+        if (arm.getState().isFront() != targetState.isFront()) {
+            arm.switchSides(targetState);
         } else {
-            arm.setState(state);
+            arm.setState(targetState);
         }
     }
 
     @Override
     public boolean isFinished() {
-        return arm.atTargetElbowAngle() && arm.atTargetElbowAngle() && arm.getState() == state;
+        return arm.getState() == targetState && arm.atTargetShoulderAngle() && arm.atTargetElbowAngle();
     }
 }

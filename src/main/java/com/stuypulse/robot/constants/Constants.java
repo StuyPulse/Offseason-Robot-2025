@@ -3,26 +3,12 @@ package com.stuypulse.robot.constants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotBase;
-
 public interface Constants {
-    public static final Mode simMode = Mode.SIM;
-    public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
     public static final double SHOOTER_Y_OFFSET = 0;
 
     double LENGTH_WITH_BUMPERS_METERS = Units.inchesToMeters(30);
     double WIDTH_WITH_BUMPERS_METERS = Units.inchesToMeters(30);
 
-    public static enum Mode {
-        /** Running on a real robot. */
-        REAL,
-
-        /** Running a physics simulator. */
-        SIM,
-
-        /** Replaying from a log file. */
-        REPLAY
-    }
     public interface DoubleJointedArm {
         double BASE_HEIGHT = 0.2032; // 8 in -> 0.2032 m
         
@@ -39,6 +25,9 @@ public interface Constants {
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-90);
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(90);
+
+            double maxVelocity = Math.toRadians(360); // rad/s
+            double maxAcceleration = Math.toRadians(720); // rad/s^2
             
         }
 
@@ -55,6 +44,9 @@ public interface Constants {
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
+
+            double maxVelocity = Math.toRadians(360); // rad/s
+            double maxAcceleration = Math.toRadians(720); // rad/s^2
         }
     }
 
