@@ -27,7 +27,7 @@ public interface Constants {
             Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(90);
 
             double maxVelocity = Math.toRadians(360); // rad/s
-            double maxAcceleration = Math.toRadians(720); // rad/s^2
+            double maxAcceleration = Math.toRadians(45.0); // rad/s^2
             
         }
 
@@ -38,8 +38,9 @@ public interface Constants {
             double MOTOR_GEAR_RATIO = 40000.0 / 399.0;
             double ENCODER_GEAR_RATIO = 1.0 / 3.0327; 
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
-    
-            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.707827 - Math.PI / 2.0).getRotations();
+
+            //double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(-49.486).getRotations();
+            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.707827 - Math.PI / 2.0 + 7.0*Math.PI / 180.0).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);

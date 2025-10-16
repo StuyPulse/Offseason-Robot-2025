@@ -39,37 +39,15 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public interface Devices {
 
     public interface DoubleJointedArm {
-        public interface Shoulder {
-            TalonFXConfig motor_config = new TalonFXConfig()
-                .withCurrentLimitAmps(80)
-                .withRampRate(0.25)
-                .withNeutralMode(NeutralModeValue.Brake)
-                .withInvertedValue(InvertedValue.CounterClockwise_Positive)
-                .withPIDConstants(0.15744, 0, 0.015, 0)
-                .withFFConstants(0.2272, 0.9590, 0.15361, 0.8, 0)
-                .withGravityType(GravityTypeValue.Arm_Cosine)
-                .withSensorToMechanismRatio(Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO)
-                .withRemoteSensor(Ports.DoubleJointedArm.Shoulder.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
-                .withMotionProfile(10, 10);
+        public class Shoulder {
+            public static TalonFXConfiguration getMotorConfig() {
+                TalonFXConfiguration motor_config = new TalonFXConfiguration();
+    
+                motor_config.Feedback.SensorToMechanismRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
+                motor_config.Feedback.RotorToSensorRatio = Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO;
 
-            TalonFXConfig motor_followerConfig = new TalonFXConfig()
-                    .withCurrentLimitAmps(80)
-                    .withRampRate(0.25)
-                    .withNeutralMode(NeutralModeValue.Brake)
-                    .withInvertedValue(InvertedValue.CounterClockwise_Positive)
-                    .withPIDConstants(0.15744, 0, 0.015, 0)
-                    .withFFConstants(0.2272, 0.9590, 0.15361, 0.8, 0)
-                    .withGravityType(GravityTypeValue.Arm_Cosine)
-                    .withSensorToMechanismRatio(Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO)
-                    .withRemoteSensor(Ports.DoubleJointedArm.Shoulder.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Shoulder.GEAR_RATIO)
-                    .withMotionProfile(10, 10);
-
-            CANcoderConfiguration cc_config = new CANcoderConfiguration()
-            .withMagnetSensor(
-                new MagnetSensorConfigs()
-                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                    .withMagnetOffset(Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT)
-                    .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Shoulder.ENCODER_UPPER_LIMIT_ROT));
+                return motor_config;
+            }
         }
 
         public interface Elbow {
@@ -82,7 +60,7 @@ public interface Devices {
                 .withFFConstants(0, 0, 0, 0)
                 .withGravityType(GravityTypeValue.Arm_Cosine)
                 .withSensorToMechanismRatio(0)
-                .withRemoteSensor(Ports.DoubleJointedArm.Elbow.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.GEAR_RATIO)
+                // .withRemoteSensor(Ports.DoubleJointedArm.Elbow.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.GEAR_RATIO)
                 .withMotionProfile(0, 0);
             
             CANcoderConfiguration cc_config = new CANcoderConfiguration()
@@ -99,7 +77,7 @@ public interface Devices {
         TalonFXConfig motor_config = new TalonFXConfig()
             .withCurrentLimitAmps(80)
             .withRampRate(0.25)
-            .withNeutralMode(NeutralModeValue.Brake)
+            .withNeutralMode(NeutralModeValue.Brake)    
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withPIDConstants(0, 0, 0, 0)
             .withFFConstants(0, 0, 0, 0)
@@ -298,12 +276,19 @@ public interface Devices {
             feedbackConfigs.RotorToSensorRatio = rotorToSensorRatio;
 
             configuration.withFeedback(feedbackConfigs);
-
             return this;
         }
 
         public TalonFXConfig withSensorToMechanismRatio(double sensorToMechanismRatio) {
             feedbackConfigs.SensorToMechanismRatio = sensorToMechanismRatio;
+
+            configuration.withFeedback(feedbackConfigs);
+
+            return this;
+        }
+
+        public TalonFXConfig withRotorToSensorConfigRatio(double ratio) {
+            feedbackConfigs.RotorToSensorRatio = ratio;
 
             configuration.withFeedback(feedbackConfigs);
 
