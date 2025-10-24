@@ -266,8 +266,8 @@ public class ArmImpl extends Arm {
 
     // Return 2x1 Matrix
     public Matrix<N2, N1> getVelocities() {
-        double a0_0 = new Rotation2d(shoulderEncoder.getVelocity().getValueAsDouble()).getRadians();
-        double a1_0 = new Rotation2d(elbowEncoder.getVelocity().getValueAsDouble()).getRadians();
+        double a0_0 = shoulderEncoder.getVelocity().getValueAsDouble() * 2 * Math.PI;
+        double a1_0 = elbowEncoder.getVelocity().getValueAsDouble() * 2 * Math.PI;
         vMatrix.set(0, 0, a0_0);
         vMatrix.set(1, 0, a1_0);
         return vMatrix;
@@ -386,7 +386,7 @@ public class ArmImpl extends Arm {
 
     @Override 
     public Matrix<N2, N1> calculateVoltage() {
-        return BMatrix.inv().times(calculateTorque(targetVelocityMatrix,targetAccelMatrix).plus(kBMatrix.times(vMatrix)));
+        return BMatrix.inv().times(calculateTorque(targetVelocityMatrix,targetAccelMatrix).plus(kBMatrix.times(targetVelocityMatrix)));
         // return calculateTorque(targetVelocityMatrix, targetAccelMatrix);
     }
 }
