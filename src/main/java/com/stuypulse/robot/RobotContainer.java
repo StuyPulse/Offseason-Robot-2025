@@ -6,6 +6,7 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.arm.ArmTest45;
+import com.stuypulse.robot.commands.arm.ArmTestUp;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
 import com.stuypulse.robot.commands.auton.MoveArm;
 import com.stuypulse.robot.constants.Constants;
@@ -18,6 +19,7 @@ import com.stuypulse.stuylib.input.gamepads.AutoGamepad;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class RobotContainer {
 
@@ -31,6 +33,10 @@ public class RobotContainer {
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
+	public RobotContainer() {
+		configureButtonBindings();
+	}
+
 	/****************/
 	/*** DEFAULTS ***/
 	/****************/
@@ -43,6 +49,7 @@ public class RobotContainer {
 
 	private void configureButtonBindings() {
         driver.getDPadRight().onTrue(new ArmTest45());
+		driver.getDPadUp().onTrue(new ArmTestUp());
     }
 
 	/**************/

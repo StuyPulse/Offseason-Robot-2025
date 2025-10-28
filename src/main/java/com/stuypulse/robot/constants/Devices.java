@@ -46,6 +46,8 @@ public interface Devices {
                 motor_config.Feedback.SensorToMechanismRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
                 motor_config.Feedback.RotorToSensorRatio = Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO;
 
+                motor_config.MotorOutput = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
+
                 return motor_config;
             }
         }
@@ -54,7 +56,7 @@ public interface Devices {
             TalonFXConfig motor_config = new TalonFXConfig()
                 .withCurrentLimitAmps(80)
                 .withRampRate(0.25)
-                .withNeutralMode(NeutralModeValue.Coast)
+                .withNeutralMode(NeutralModeValue.Brake)
                 .withInvertedValue(InvertedValue.Clockwise_Positive)
                 .withPIDConstants(0, 0, 0, 0)
                 .withFFConstants(0, 0, 0, 0)

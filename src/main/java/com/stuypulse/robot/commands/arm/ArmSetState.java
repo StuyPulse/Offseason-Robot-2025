@@ -19,9 +19,8 @@ public class ArmSetState extends Command {
     public void initialize() {
         if (arm.getState().isFront() != targetState.isFront()) {
             arm.switchSides(targetState);
-        } else {
-            arm.setState(targetState);
         }
+        arm.setState(targetState);
     }
 
     @Override

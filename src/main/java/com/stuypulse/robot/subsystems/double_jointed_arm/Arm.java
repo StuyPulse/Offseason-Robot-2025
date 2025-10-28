@@ -41,7 +41,7 @@ public abstract class Arm extends SubsystemBase{
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
         TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(0.0)),
-        TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-135.0)),
+        TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(90)),
         INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90.0));
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;
@@ -100,7 +100,7 @@ public abstract class Arm extends SubsystemBase{
     private ArmState state; 
 
     protected Arm() {
-        this.state = ArmState.STOW;
+        this.state = ArmState.INT;
 
         // We assume the arm starts at the STOW state
         shoulderProfile = new TrapezoidProfile(
@@ -111,7 +111,7 @@ public abstract class Arm extends SubsystemBase{
         );
         
         currentShoulderState = new TrapezoidProfile.State(ArmState.STOW.shoulderTargetAngle.getRadians(), 0.0);
-        targetShoulderState = new TrapezoidProfile.State(ArmState.STOW.shoulderTargetAngle.getRadians(), 0.0); 
+        targetShoulderState = new TrapezoidProfile.State(ArmState.INT.shoulderTargetAngle.getRadians(), 0.0); 
 
         elbowProfile = new TrapezoidProfile(
             new Constraints(
@@ -119,9 +119,9 @@ public abstract class Arm extends SubsystemBase{
                 Constants.DoubleJointedArm.Elbow.maxAcceleration
             )
         );
-
+        
         currentElbowState = new TrapezoidProfile.State(ArmState.STOW.elbowTargetAngle.getRadians(), 0.0);
-        targetElbowState = new TrapezoidProfile.State(ArmState.STOW.elbowTargetAngle.getRadians(), 0.0);
+        targetElbowState = new TrapezoidProfile.State(ArmState.INT.elbowTargetAngle.getRadians(), 0.0);
     }
 
     public ArmState getState(){
