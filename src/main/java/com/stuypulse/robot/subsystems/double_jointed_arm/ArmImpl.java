@@ -1,6 +1,8 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
@@ -9,6 +11,8 @@ import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.constants.Settings;
+import com.stuypulse.stuylib.streams.numbers.filters.HighPassFilter;
+import com.stuypulse.stuylib.streams.numbers.filters.IFilter;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -19,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -53,7 +58,7 @@ public class ArmImpl extends Arm {
 
     // Physical Constants
     private final double shoulderMass = Constants.DoubleJointedArm.Shoulder.MASS;       // kg
-    private final double elbowMass = Constants.DoubleJointedArm.Elbow.MASS + Constants.Wrist.MASS;             // kg
+    private final double elbowMass = Constants.DoubleJointedArm.Elbow.MASS;             // kg
     private final double shoulderLength = Constants.DoubleJointedArm.Shoulder.LENGTH;   // m
     private final double elbowLength = Constants.DoubleJointedArm.Elbow.LENGTH;         // m
     private final double GRAVITY = 9.81;
@@ -62,8 +67,8 @@ public class ArmImpl extends Arm {
     private final double kU = 6000.0 / 12.0; // Free speed / Volts
     private final double r = 12.0 / 366.0;   // Volts / Stall current
     // Conversion Factors
-    private final double shoulderGearRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
-    private final double elbowGearRatio = Constants.DoubleJointedArm.Elbow.MOTOR_GEAR_RATIO;
+    private final double shoulderGearRatio = Constants.DoubleJointedArm.Shoulder.GEAR_RATIO;
+    private final double elbowGearRatio = Constants.DoubleJointedArm.Elbow.GEAR_RATIO;
 
     public ArmImpl() {
         frontShoulderMotor = new TalonFX(Ports.DoubleJointedArm.Shoulder.FRONT_MOTOR, "CANIVORE");
@@ -102,7 +107,7 @@ public class ArmImpl extends Arm {
         // Devices.DoubleJointedArm.Shoulder.motor_followerConfig.configure(backShoulderMotor);
         // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
 
-        // backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
+        backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
 
         // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
     }
@@ -137,12 +142,12 @@ public class ArmImpl extends Arm {
 
     @Override
     public double getShoulderVelocity() {
-        return shoulderEncoder.getVelocity().getValueAsDouble() * 2*Math.PI;
+        return frontShoulderMotor.getVelocity().getValueAsDouble() * 2*Math.PI * Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO;
     }
 
     @Override
     public double getElbowVelocity() {
-        return elbowEncoder.getVelocity().getValueAsDouble() * 2*Math.PI;
+        return elbowMotor.getVelocity().getValueAsDouble() * 2*Math.PI;
     }
 
     @Override
@@ -189,11 +194,19 @@ public class ArmImpl extends Arm {
         final double dt = 0.02f;
 
         currentShoulderState.position = getShoulderAngle().getRadians();
-        currentShoulderState.velocity = getShoulderVelocity();
+        currentShoulderState.velocity = 0;
 
         currentElbowState.position = getElbowAngle().getRadians();
-        currentElbowState.velocity = getElbowVelocity();
+        currentElbowState.velocity = 0;
 
+        shoulderProfile = new TrapezoidProfile(
+            new Constraints(Constants.DoubleJointedArm.Shoulder.maxVelocity, Constants.DoubleJointedArm.Shoulder.MAX_TORQUE / calculateMMatrix().get(0, 0))
+        );
+
+        elbowProfile = new TrapezoidProfile(
+            new Constraints(Constants.DoubleJointedArm.Elbow.maxVelocity, Constants.DoubleJointedArm.Elbow.MAX_TORQUE/calculateMMatrix().get(1, 1))
+        );
+        
         // this is the next step in the profile
         TrapezoidProfile.State nextShoulderState = shoulderProfile.calculate(
             dt,
@@ -220,14 +233,15 @@ public class ArmImpl extends Arm {
         calculateBackEmf();
         calculateMotorTorque();
 
-        double shoulderVolts = calculateVoltage().get(0, 0) / Constants.DoubleJointedArm.Shoulder.GEAR_RATIO;
-        double elbowVolts = -calculateVoltage().get(1, 0) / Constants.DoubleJointedArm.Elbow.GEAR_RATIO;
+        // if(!atTargetShoulderAngle()) {
+        double shoulderVolts = calculateVoltage().get(0, 0);
+        double elbowVolts = -calculateVoltage().get(1, 0);
 
-        frontShoulderMotor.setControl(new VoltageOut(shoulderVolts));
+        if(!atTargetShoulderAngle()) frontShoulderMotor.setControl(new VoltageOut(shoulderVolts));
+        else frontShoulderMotor.set(0);
+        if(!atTargetElbowAngle()) elbowMotor.setControl(new VoltageOut(elbowVolts));
+        else elbowMotor.set(0);
         
-        elbowMotor.setControl(new VoltageOut(elbowVolts));
-
-        // Logging
         SmartDashboard.putNumber("DoubleJointedArm/currentShoulderState Position", currentShoulderState.position);
         SmartDashboard.putNumber("DoubleJointedArm/currentShoulderState Velocity From Motor Controller", getShoulderVelocity() * (180f / Math.PI ));
         SmartDashboard.putNumber("DoubleJointedArm/currentShoulderState Velocity", currentShoulderState.velocity);
@@ -236,36 +250,28 @@ public class ArmImpl extends Arm {
         SmartDashboard.putNumber("DoubleJointedArm/nextShoulderState Velocity", nextShoulderState.velocity * (180f/Math.PI));
         SmartDashboard.putNumber("DoubleJointedArm/nextShoulderState Position", nextShoulderState.position);
         SmartDashboard.putString("DoubleJointedArm/State", getState().toString());
-        // SmartDashboard.putNumber("DoubleJointedArm/State", frontShoulderMotor.get)
-        // SmartDashboard.putNumber("DoubleJointedArm/Target Shoulder Angle", getState().getShoulderTargetAngle().getDegrees());
-        // SmartDashboard.putNumber("DoubleJointedArm/Target Elbow Angle", getState().getElbowTargetAngle().getDegrees());
+        
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", shoulderVolts);
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowVolts);
+    // }
+    // else frontShoulderMotor.setControl(new VoltageOut(0));
+        // Logging
+
 
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Angle", getShoulderAngle().getDegrees());
         SmartDashboard.putNumber("DoubleJointedArm/Relative elbow Angle", getRelativeElbowAngle().getDegrees());
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Angle", getElbowAngle().getDegrees());
-        // SmartDashboard.putNumber("DoubleJointedArm/End Height", getEndPosition().getY());
 
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Acceleration", getAccelerations().get(0, 0));
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow Acceleration", getAccelerations().get(1, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Velocity", getVelocities().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Velocity", getVelocities().get(1, 0));
-
-        // SmartDashboard.putNumber("DoubleJointedArm/Shoulder debug accel", frontShoulderMotor.getVelocity().getValueAsDouble()/0.02);
-        // SmartDashboard.putNumber("DoubleJointedArm/Shoulder Acceleration", getAccelerations().get(0, 0));
-        // SmartDashboard.putNumber("DoubleJointedArm/Elbow Acceleration", getAccelerations().get(1, 0));
 
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Target Velocity", targetVelocityMatrix.get(0, 0) * (180 / Math.PI));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Target Velocity", targetVelocityMatrix.get(1, 0)* (180 / Math.PI));
 
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder Target Acceleration", targetAccelMatrix.get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow Target Acceleration", targetAccelMatrix.get(1, 0));
-
-        // SmartDashboard.putNumber("DoubleJointedArm/shoulder cancoder debugging", shoulderEncoder.getPosition().getValueAsDouble());
-        // SmartDashboard.putNumber("DoubleJointedArm/shoulder motor debugging", frontShoulderMotor.getPosition().getValueAsDouble());
-
-        // SmartDashboard.putNumber("DoubleJointedArm/Shoulder Torque", calculateTorque().get(0, 0));
-        // SmartDashboard.putNumber("DoubleJointedArm/Elbow Torque", calculateTorque().get(1, 0));
-
-        SmartDashboard.putNumber("DoubleJointedArm/Shoulder Voltage", shoulderVolts);
-        SmartDashboard.putNumber("DoubleJointedArm/Elbow Voltage", elbowVolts);
 
         SmartDashboard.putNumber("DoubleJointedArm/Shoulder MT", BMatrix.inv().get(0, 0));
         SmartDashboard.putNumber("DoubleJointedArm/Elbow MT", BMatrix.inv().get(1,1));
@@ -300,9 +306,15 @@ public class ArmImpl extends Arm {
         //higher moment of inertia means it's harder to change the rotational speed of the object
         // for a rod rotating about one end: I = (1/3) * m * L^2 -> becomes lower if rotating about center of mass
 
+        final double shoulderWidth = Constants.DoubleJointedArm.Shoulder.WIDTH;
+        final double elbowWidth = Constants.DoubleJointedArm.Elbow.WIDTH;
+
         // 1/3 mass * length^2
-        double I1 = shoulderMass * Math.pow(shoulderLength, 2) / 3.0; 
-        double I2 = elbowMass * Math.pow(elbowLength, 2) / 3.0;
+        double I1 = shoulderMass*(Math.pow(shoulderWidth,2)+Math.pow(shoulderLength, 2))/12f;
+        double I2 = elbowMass*(Math.pow(elbowWidth,2)+Math.pow(elbowLength, 2))/12f + Constants.Wrist.MASS * Math.pow(elbowLength/2, 2);
+
+        // double I1 = shoulderMass * Math.pow(shoulderLength, 2) / 3.0; 
+        // double I2 = elbowMass * Math.pow(elbowLength, 2) / 3.0 + Constants.Wrist.MASS * Math.pow(elbowLength/2, 2);
         
         double m0_0 = shoulderMass * Math.pow(shoulderLength/2.0, 2) 
                     + elbowMass * (Math.pow(shoulderLength, 2) + Math.pow(elbowLength/2.0, 2))
@@ -323,6 +335,9 @@ public class ArmImpl extends Arm {
         mMatrix.set(0, 1, m0_1);
         mMatrix.set(1, 0, m0_1); // m1_0 = m0_1
         mMatrix.set(1, 1, m1_1);
+
+        SmartDashboard.putNumber("DoubleJointedArm/Shoulder moment of inertia", m0_0);
+        SmartDashboard.putNumber("DoubleJointedArm/Elbow moment of inertia", m1_1);
         
         return mMatrix;
     }
@@ -367,8 +382,8 @@ public class ArmImpl extends Arm {
                 .plus(calculateGMatrix());
         
         //Change ths sign of the torque based on the joint target velocities
-        torqueMatrix.set(0, 0, torqueMatrix.get(0, 0) * Math.signum(velocities.get(0, 0)));
-        torqueMatrix.set(1, 0, torqueMatrix.get(1, 0) * Math.signum(velocities.get(1, 0)));
+        torqueMatrix.set(0, 0, torqueMatrix.get(0, 0));// * Math.signum(velocities.get(0, 0)));
+        torqueMatrix.set(1, 0, torqueMatrix.get(1, 0));// * Math.signum(velocities.get(1, 0)));
 
         SmartDashboard.putNumber("DoubleJointedArm/Torque Shoulder", torqueMatrix.get(0,0));
         SmartDashboard.putNumber("DoubleJointedArm/Torque Elbow", torqueMatrix.get(1,0));

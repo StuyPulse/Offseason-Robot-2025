@@ -40,7 +40,7 @@ public abstract class Arm extends SubsystemBase{
 
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
-        TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(0.0)),
+        TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(-180.0)),
         TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(90)),
         INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90.0));
         private Rotation2d shoulderTargetAngle;
@@ -112,7 +112,7 @@ public abstract class Arm extends SubsystemBase{
         
         currentShoulderState = new TrapezoidProfile.State(ArmState.STOW.shoulderTargetAngle.getRadians(), 0.0);
         targetShoulderState = new TrapezoidProfile.State(ArmState.INT.shoulderTargetAngle.getRadians(), 0.0); 
-
+ 
         elbowProfile = new TrapezoidProfile(
             new Constraints(
                 Constants.DoubleJointedArm.Elbow.maxVelocity, 
