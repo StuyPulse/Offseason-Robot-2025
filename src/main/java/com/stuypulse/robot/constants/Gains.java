@@ -4,7 +4,21 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.stuypulse.stuylib.network.SmartNumber;
 
 public interface Gains {
-
+    public interface DoubleJointedArm {
+        public interface ShoulderPIDF {
+                double kP = 1f;
+                double kI = 0.0;
+                double kD = 0.002;
+                double kF = .5;
+        }
+        
+        public interface ElbowPIDF {
+                double kP = 1.625;
+                double kI = 0.0;
+                double kD = 0.005;
+                double kF = .25;
+        }
+    }
     public interface Swerve {
 
         public interface Alignment {

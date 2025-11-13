@@ -23,7 +23,7 @@ public interface Constants {
             double ENCODER_GEAR_RATIO = 1.0 / 4.625;
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
 
-            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(2.1).getRotations();
+            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(2.1 + Math.toRadians(29f)).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(0);
@@ -45,7 +45,7 @@ public interface Constants {
             double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
 
             //double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(-49.486).getRotations();
-            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.707827 - Math.PI / 2.0 + 7.0*Math.PI / 180.0).getRotations();
+            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.707827 - Math.PI / 2.0 + 7.0*Math.PI / 180.0 - Math.toRadians(3f)).getRotations();
             double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
 
             Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);

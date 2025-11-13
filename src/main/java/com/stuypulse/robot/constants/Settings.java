@@ -12,64 +12,35 @@ import edu.wpi.first.math.util.Units;
  * values that we can edit on Shuffleboard.
  */
 public interface Settings {
-    
     double DT = 0.02;
     String CANIVORE = "CANIVORE";
     double TARGET_DISTANCE_FROM_REEF = 0;
+    
     public interface DoubleJointedArm {
-
         public static final double PATH_DT = 0.1; // Time between path points (sec)
         public static final double SPLINE_DURATION = 0.5; // Duration per spline segment
 
         public interface Shoulder {
-
             double DEFAULT = 90.0;
             double L2 = 0.0;
             double L3 = 0.0;
             double L4 = 0.0;
 
-            public interface PID{
-                double kP = 0.0;
-                double kI = 0.0;
-                double kD = 0.0;
-            }
-            public interface FF{
-                double kS = 0.0;
-                double kG = 0.0;
-                double kV = 0.0;
-                double kA = 0.0;
-            }
-
-            double TOLERANCE = .1;
+            double TOLERANCE = .05;
             
             Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
         }
         
         public interface Elbow {
-
             double DEFAULT = -90.0;
             double L2 = 0.0;
             double L3 = 0.0;
             double L4 = 0.0;
             
-            public interface PID{
-                double kP = 0.0;
-                double kI = 0.0;
-                double kD = 0.0;
-            }
-            public interface FF{
-                double kS = 0.0;
-                double kG = 0.0;
-                double kV = 0.0;
-                double kA = 0.0;
-            }
-
             double TOLERANCE = 0.1;
 
             Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
         }
-            
-
     }
     
     public interface Wrist {

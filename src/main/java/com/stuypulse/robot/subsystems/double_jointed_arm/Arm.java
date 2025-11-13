@@ -41,6 +41,7 @@ public abstract class Arm extends SubsystemBase{
     public enum ArmState {
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
         TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(-180.0)),
+        TEST_45(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
         TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(90)),
         INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90.0));
         private Rotation2d shoulderTargetAngle;
@@ -69,13 +70,13 @@ public abstract class Arm extends SubsystemBase{
         return this.name().endsWith("FRONT") || this.equals(ArmState.STOW);
         }
 
-        public ArmState getOpposite() {
-            switch (this) {
-                case TEST_FRONT: return TEST_BACK;
-                case TEST_BACK: return TEST_FRONT;
-                default: return STOW;
-            }
-        }
+        // public ArmState getOpposite() {
+        //     switch (this) {
+        //         case TEST_FRONT: return TEST_BACK;
+        //         case TEST_BACK: return TEST_FRONT;
+        //         default: return STOW;
+        //     }
+        // }
     }
 
     public abstract Rotation2d getShoulderAngle();

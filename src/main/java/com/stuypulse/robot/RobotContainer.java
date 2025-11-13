@@ -6,6 +6,7 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.arm.ArmTest45;
+import com.stuypulse.robot.commands.arm.ArmTest4545;
 import com.stuypulse.robot.commands.arm.ArmTestUp;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
 import com.stuypulse.robot.commands.auton.MoveArm;
@@ -50,6 +51,7 @@ public class RobotContainer {
 	private void configureButtonBindings() {
         driver.getDPadRight().onTrue(new ArmTest45());
 		driver.getDPadUp().onTrue(new ArmTestUp());
+		driver.getDPadDown().onTrue(new ArmTest4545());
     }
 
 	/**************/
