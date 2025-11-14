@@ -11,8 +11,6 @@ import com.stuypulse.robot.commands.arm.ArmTest45;
 import com.stuypulse.robot.commands.arm.ArmTest4545;
 import com.stuypulse.robot.commands.arm.ArmTestUp;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
-import com.stuypulse.robot.commands.auton.MoveArm;
-import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
@@ -22,7 +20,6 @@ import com.stuypulse.stuylib.input.gamepads.AutoGamepad;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class RobotContainer {
 
@@ -32,6 +29,7 @@ public class RobotContainer {
     
     // Subsystem
     private final Arm dja = Arm.getInstance();
+	public final SwerveDrive swerve = SwerveDrive.getInstance();
 
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
