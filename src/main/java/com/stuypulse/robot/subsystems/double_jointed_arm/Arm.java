@@ -43,6 +43,8 @@ public abstract class Arm extends SubsystemBase{
         TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(-180.0)),
         TEST_45(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
         TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(90)),
+        L4_BACK(Rotation2d.fromDegrees(84.4), Rotation2d.fromDegrees(137.2)),
+        L4_BACK_OUT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(137.2)),
         INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90.0));
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;
