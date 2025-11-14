@@ -26,6 +26,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.stuypulse.robot.constants.Devices.TalonFXConfig;
 
 /*-
  * File containing all of the configurations that different motors require.
@@ -94,28 +95,38 @@ public interface Devices {
                 .withAbsoluteSensorDiscontinuityPoint(1));
     }
 
-    public interface Swerve {
+   public interface Swerve {
         public interface Turn {
             SparkBaseConfig motorConfig = new SparkMaxConfig().inverted(true).smartCurrentLimit(200).openLoopRampRate(0.25).idleMode(IdleMode.kBrake);
         }
         public interface Drive {
-            TalonFXConfig motorConfig = new TalonFXConfig()
-                .withCurrentLimitAmps(65)
-                .withRampRate(0.25)
-                .withNeutralMode(NeutralModeValue.Brake)
-                .withInvertedValue(InvertedValue.Clockwise_Positive)
-                .withPIDConstants(
-                    Gains.Swerve.Drive.kP, 
-                    Gains.Swerve.Drive.kI, 
-                    Gains.Swerve.Drive.kD, 0)
-                .withFFConstants(
-                    Gains.Swerve.Drive.kS, 
-                    Gains.Swerve.Drive.kV, 
-                    Gains.Swerve.Drive.kA, 0)
-                .withSensorToMechanismRatio(1/Constants.Swerve.Encoder.Drive.POSITION_CONVERSION)
-                .withMotionProfile(Settings.Swerve.MAX_MODULE_SPEED, Settings.Swerve.MAX_MODULE_ACCEL);
+            Slot0Configs slot0Configs = new Slot0Configs()
+                .withKS(Gains.Swerve.Drive.kS)
+                .withKV(Gains.Swerve.Drive.kV)
+                .withKA(Gains.Swerve.Drive.kA)
+                .withKP(Gains.Swerve.Drive.kP)
+                .withKI(Gains.Swerve.Drive.kI)
+                .withKD(Gains.Swerve.Drive.kD);
+            
+            MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake);
+
+            ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs()
+                .withTorqueClosedLoopRampPeriod(0.25);
+            
+            CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(65);
+
+            FeedbackConfigs feedbackConfigs = new FeedbackConfigs().withSensorToMechanismRatio(1/Constants.Swerve.Encoder.Drive.POSITION_CONVERSION);
+
+            TalonFXConfiguration motorConfig = new TalonFXConfiguration()
+                .withSlot0(slot0Configs)
+                .withMotorOutput(motorOutputConfigs)
+                .withClosedLoopRamps(closedLoopRampsConfigs)
+                .withCurrentLimits(currentLimitsConfigs)
+                .withFeedback(feedbackConfigs);
         }
-    }
     /** Classes to store all of the values a motor needs */
 
     public static class TalonFXConfig {
