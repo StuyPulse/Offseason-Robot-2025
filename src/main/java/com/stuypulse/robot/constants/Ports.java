@@ -25,6 +25,7 @@ public interface Ports {
     public interface Wrist {
         int WRIST_MOTOR = 19;
         int WRIST_ENCODER = 20;
+        int ROLLER_MOTOR = 0;
     }
 
     public interface Swerve {

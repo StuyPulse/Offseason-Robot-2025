@@ -17,13 +17,19 @@ public class Wrist extends SubsystemBase {
     }
 
     public enum WristState {
-        FRONT(Rotation2d.fromDegrees(180)), 
-        STOW(Rotation2d.fromDegrees(90)); 
+        FRONT(Rotation2d.fromDegrees(180f), 200), 
+        STOW(Rotation2d.fromDegrees(90f), 0); 
         
         private Rotation2d targetAngle;
-        
-        private WristState(Rotation2d targetAngle) {
+        private double targetRPM;
+
+        private WristState(Rotation2d targetAngle, double targetRPM) {
             this.targetAngle = targetAngle;
+            this.targetRPM = targetRPM;
+        }
+
+        public double getTargetRPM() {
+            return this.targetRPM;
         }
 
         public Rotation2d getTargetAngle() {
@@ -37,6 +43,8 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putString("Wrist/State", state.name());
         SmartDashboard.putNumber("Wrist/Target Angle (Deg)", state.targetAngle.getDegrees());
+        SmartDashboard.putNumber("Wrist/Target RPM", state.getTargetRPM());
     }
 }

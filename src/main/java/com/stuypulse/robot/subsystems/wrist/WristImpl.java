@@ -9,18 +9,20 @@ import com.stuypulse.stuylib.control.Controller;
 import com.stuypulse.stuylib.control.feedback.PIDController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class WristImpl extends Wrist {
-    private TalonFX rotationMotor;
-    private TalonFX rollerMotor;
+    private final TalonFX rotationMotor;
+    private final TalonFX rollerMotor;
     
-    private CoreCANcoder throughbore;
+    private final CoreCANcoder throughbore;
 
-    private Controller controller;
+    private final Controller controller;
 
     public WristImpl() {
         super();
         rotationMotor = new TalonFX(Ports.Wrist.WRIST_MOTOR, Settings.CANIVORE);
+        rollerMotor = new TalonFX(Ports.Wrist.ROLLER_MOTOR, Settings.CANIVORE);
         throughbore = new CoreCANcoder(Ports.Wrist.WRIST_ENCODER, Settings.CANIVORE);
 
         controller = new PIDController(Gains.Wrist.kP, Gains.Wrist.kI, Gains.Wrist.kD);
@@ -30,10 +32,24 @@ public class WristImpl extends Wrist {
         return Rotation2d.fromRotations(throughbore.getAbsolutePosition().getValueAsDouble());
     }
 
+    private boolean atTargetAngle() {
+        return Math.abs(getAngle().getRadians() - state.getTargetAngle().getRadians()) < Settings.Wrist.ANGLE_TOLERANCE.getRadians();
+    }
+
+    public double getRPM() {
+        return rollerMotor.getVelocity().getValueAsDouble() * 60.0;
+    }
+
     @Override
     public void periodic() {
         super.periodic();
 
         rotationMotor.setVoltage(controller.update(state.getTargetAngle().getRadians(), getAngle().getRadians()));
+        if (atTargetAngle()) {
+            rollerMotor.set(state.getTargetRPM());
+        }
+
+        SmartDashboard.putNumber("Wrist/Current Angle (Deg)", getAngle().getDegrees());
+        SmartDashboard.putNumber("Wrist/Current RPM", getRPM());
     }
 }
