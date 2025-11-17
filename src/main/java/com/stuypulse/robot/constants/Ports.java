@@ -9,12 +9,17 @@ public interface Ports {
     }
 
     public interface DoubleJointedArm {
-        int SHOULDER_MOTOR = 14;
-        int SHOULDER_FOLLOWER = 15;
-        int SHOULDER_ENCODER = 17;
-        int ELBOW_MOTOR = 16;
-        int ELBOW_ENCODER = 18;
-        // int PIGEON = 0;
+        public interface Shoulder {
+            int FRONT_MOTOR = 14;
+            int BACK_MOTOR = 15;
+            int ENCODER = 17;
+        }
+
+        public interface Elbow {
+            int MOTOR = 16;
+            int ENCODER = 18;
+        }
+
     }
 
     public interface Wrist {

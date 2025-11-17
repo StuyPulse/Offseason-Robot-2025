@@ -5,16 +5,16 @@
 
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.arm.ArmL4;
+import com.stuypulse.robot.commands.arm.ArmL4Out;
+import com.stuypulse.robot.commands.arm.ArmTest45;
+import com.stuypulse.robot.commands.arm.ArmTest4545;
+import com.stuypulse.robot.commands.arm.ArmTestUp;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
-import com.stuypulse.robot.constants.Constants;
+import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.Ports;
-import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArm;
-import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIO;
-import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOReal;
-import com.stuypulse.robot.subsystems.double_jointed_arm.DoubleJointedArmIOSim;
+import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
-import com.stuypulse.robot.subsystems.wrist.Wrist;
-import com.stuypulse.robot.subsystems.wrist.WristIOReal;
 import com.stuypulse.stuylib.input.Gamepad;
 import com.stuypulse.stuylib.input.gamepads.AutoGamepad;
 
@@ -29,65 +29,47 @@ public class RobotContainer {
     public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
     
     // Subsystem
-    private DoubleJointedArm dja;
-    private Wrist wrist;
-    // private SwerveDrive swerve;
+	public final SwerveDrive swerve = SwerveDrive.getInstance();
 
-    // Autons
-    private static SendableChooser<Command> autonChooser = new SendableChooser<>();
+	// Autons
+	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
-    // Robot container
+	public RobotContainer() {
+		// configureButtonBindings();
+		configureDefaultCommands();
+	}
 
-    public RobotContainer() {
-        switch (Constants.currentMode) {
-            case REAL:
-              // Real robot, instantiate hardware IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIOReal());
-              wrist = new Wrist(new WristIOReal());
-              // swerve = SwerveDrive.getInstance();
-              break;
-      
-            case SIM:
-              // Sim robot, instantiate physics sim IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIOSim());
-              break;
-      
-            default:
-              // Replayed robot, disable IO implementations
-              dja = new DoubleJointedArm(new DoubleJointedArmIO() {});
-            //   drive = new Drive(new DriveIO() {}, new GyroIO() {});
-            //   roller = new Roller(new RollerIO() {});
-              break;
-        }
-        
-        configureDefaultCommands();
-        configureButtonBindings();
-        configureAutons();
+	/****************/
+	/*** DEFAULTS ***/
+	/****************/
+
+	private void configureDefaultCommands() {
+		swerve.setDefaultCommand(new SwerveDriveDrive(driver));
+	}
+
+	/***************/
+	/*** BUTTONS ***/
+	/***************/
+
+	private void configureButtonBindings() {
+		driver.getTopButton().onTrue(new ArmL4());
+		driver.getBottomButton().onTrue(new ArmL4Out());
+        driver.getDPadRight().onTrue(new ArmTest45());
+		driver.getDPadUp().onTrue(new ArmTestUp());
+		driver.getDPadDown().onTrue(new ArmTest4545());
     }
 
-    /****************/
-    /*** DEFAULTS ***/
-    /****************/
+	/**************/
+	/*** AUTONS ***/
+	/**************/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 
-    private void configureDefaultCommands() {}
+	public void configureAutons() {
+		autonChooser.setDefaultOption("Do Nothing", new DoNothingAuton());
 
-    /***************/
-    /*** BUTTONS ***/
-    /***************/
+		SmartDashboard.putData("Autonomous", autonChooser);
+	}
 
-    private void configureButtonBindings() {}
-
-    /**************/
-    /*** AUTONS ***/
-    /**************/
-
-    public void configureAutons() {
-        autonChooser.setDefaultOption("Do Nothing", new DoNothingAuton());
-
-        SmartDashboard.putData("Autonomous", autonChooser);
-    }
-
-    public Command getAutonomousCommand() {
-        return autonChooser.getSelected();
-    }
+	public Command getAutonomousCommand() {
+		return autonChooser.getSelected();
+	}
 }
