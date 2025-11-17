@@ -1,11 +1,9 @@
 package com.stuypulse.robot.subsystems.double_jointed_arm;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.stuypulse.robot.constants.Constants;
 import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Gains;
@@ -24,7 +22,6 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ArmImpl extends Arm {
@@ -109,25 +106,15 @@ public class ArmImpl extends Arm {
         frontShoulderMotor.getConfigurator().apply(Devices.DoubleJointedArm.Shoulder.getMotorConfig());
         backShoulderMotor.getConfigurator().apply(Devices.DoubleJointedArm.Shoulder.getMotorConfig());
 
-        // Devices.DoubleJointedArm.Shoulder.motor_config.configure(frontShoulderMotor);
-        
-        // Devices.DoubleJointedArm.Shoulder.motor_followerConfig.configure(backShoulderMotor);
         // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
 
         backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
-
-        // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
     }
 
     @Override
     public Rotation2d getShoulderAngle() {
         return Rotation2d.fromRotations(shoulderEncoder.getPosition().getValueAsDouble() * Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO + Constants.DoubleJointedArm.Shoulder.ENCODER_OFFSET_ROT);
     }
- 
-    // @Override
-     //public Rotation2d getElbowAngle() {
-       //  return Rotation2d.fromRotations(elbowEncoder.getPosition().getValueAsDouble() * Constants.DoubleJointedArm.Elbow.ENCODER_GEAR_RATIO + Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT);
-     // }
 
     public Rotation2d getPerfectElbowAngle() {
         return Rotation2d.fromRotations(elbowEncoder.getPosition().getValueAsDouble() * Constants.DoubleJointedArm.Elbow.ENCODER_GEAR_RATIO + Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT);
@@ -141,8 +128,6 @@ public class ArmImpl extends Arm {
     @Override
     public Rotation2d getElbowAngle() {
         double primitive = (getPerfectElbowAngle().getRotations() - (0.25 - getShoulderAngle().getRotations()));
-
-        //while( primitive<1 ) { primitive+=1; }
 
         return Rotation2d.fromRotations(primitive);
     }
