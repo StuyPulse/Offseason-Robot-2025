@@ -11,6 +11,7 @@ import com.stuypulse.robot.commands.arm.ArmTest45;
 import com.stuypulse.robot.commands.arm.ArmTest4545;
 import com.stuypulse.robot.commands.arm.ArmTestUp;
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
+import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.double_jointed_arm.Arm;
 import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
@@ -28,21 +29,23 @@ public class RobotContainer {
     public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
     
     // Subsystem
-    private final Arm dja = Arm.getInstance();
 	public final SwerveDrive swerve = SwerveDrive.getInstance();
 
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
 	public RobotContainer() {
-		configureButtonBindings();
+		// configureButtonBindings();
+		configureDefaultCommands();
 	}
 
 	/****************/
 	/*** DEFAULTS ***/
 	/****************/
 
-	private void configureDefaultCommands() {}
+	private void configureDefaultCommands() {
+		swerve.setDefaultCommand(new SwerveDriveDrive(driver));
+	}
 
 	/***************/
 	/*** BUTTONS ***/

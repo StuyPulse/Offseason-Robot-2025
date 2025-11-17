@@ -26,7 +26,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.stuypulse.robot.constants.Devices.TalonFXConfig;
+// import com.stuypulse.robot.constants.Devices.TalonFXConfig;
 
 /*-
  * File containing all of the configurations that different motors require.
@@ -127,6 +127,7 @@ public interface Devices {
                 .withCurrentLimits(currentLimitsConfigs)
                 .withFeedback(feedbackConfigs);
         }
+    }
     /** Classes to store all of the values a motor needs */
 
     public static class TalonFXConfig {

@@ -33,13 +33,13 @@ public class SwerveModuleImpl extends SwerveModule {
         super(name, location);
 
         driveMotor = new TalonFX(driveMotorID, Settings.CANIVORE);
-        Devices.Swerve.Drive.motorConfig.configure(driveMotor);
+        driveMotor.getConfigurator().apply(Devices.Swerve.Drive.motorConfig);
 
         this.angleOffset = angleOffset;
 
         pivotMotor = new SparkMax(pivotMotorID, MotorType.kBrushless);
         pivotMotor.configure(Devices.Swerve.Turn.motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        pivotEncoder = new CANcoder(pivotEncoderID, "rio");
+        pivotEncoder = new CANcoder(pivotEncoderID, Settings.CANIVORE);
 
         pivotController = new AnglePIDController(Gains.Swerve.Turn.kP, Gains.Swerve.Turn.kI, Gains.Swerve.Turn.kD);
     }
