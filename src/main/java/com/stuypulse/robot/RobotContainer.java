@@ -33,18 +33,18 @@ public class RobotContainer {
     public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
     
     // Subsystem
-	public final Arm arm;
-	public final Wrist wrist;
+	// public final Arm arm;
+	// public final Wrist wrist;
 	public final SwerveDrive swerve;
 
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
 	public RobotContainer() {
-		arm = Arm.getInstance();
-		wrist = Wrist.getInstance();
+		// arm = Arm.getInstance();
+		// wrist = Wrist.getInstance();
 		swerve = SwerveDrive.getInstance();
-		configureButtonBindings();
+		// configureButtonBindings();
 		configureDefaultCommands();
 	}
 
