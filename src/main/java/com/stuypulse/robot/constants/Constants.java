@@ -58,8 +58,8 @@ public interface Constants {
 
     public interface Wrist {
         double MASS = 2.26796; // 5 lbs -> 2.26796 kg
-        double GEAR_RATIO = 1/1;
-        double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0).getRotations();
+        double GEAR_RATIO = 24f/60f;
+        double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(180f-51.6).getRotations();
     }
 
     public interface Swerve {
@@ -78,25 +78,25 @@ public interface Constants {
 
         public interface FrontLeft {
             String ID = "Front Left";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.149902);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromDegrees(-54.7f);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * +0.5, WIDTH * +0.5);
         }
 
         public interface BackLeft {
             String ID = "Back Left";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.270752);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromDegrees(127.6f);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * -0.5, WIDTH * +0.5);
         }
 
         public interface BackRight {
             String ID = "Back Right";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.113037);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromDegrees(4.4f);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * -0.5, WIDTH * -0.5);
         }
 
         public interface FrontRight {
             String ID = "Front Right";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.441162);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromDegrees(    -158.1f);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * +0.5, WIDTH * -0.5);
         }
     }

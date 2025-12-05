@@ -59,6 +59,7 @@ public class SwerveDrive extends SubsystemBase {
         this.modules = modules;
 
         gyro = new Pigeon2(Ports.Swerve.PIGEON, Settings.CANIVORE);
+        
 
         kinematics = new SwerveDriveKinematics(getModuleOffsets());
 
@@ -173,7 +174,7 @@ public class SwerveDrive extends SubsystemBase {
 
     /** GYRO API **/
     public Rotation2d getGyroAngle() {
-        return gyro.getRotation2d();
+        return gyro.getRotation2d().plus(Rotation2d.fromDegrees(2));
     }
 
     public double getGyroYaw() {
@@ -239,7 +240,7 @@ public class SwerveDrive extends SubsystemBase {
             module2ds[i].setPose(Robot.isBlue() ? modulePose : Field.transformToOppositeAlliance(modulePose));
         }
 
-        SmartDashboard.putNumber("Swerve/Gyro Angle (deg)", getGyroPitch());
+        SmartDashboard.putNumber("Swerve/Gyro Yaw (deg)", getGyroYaw());
         SmartDashboard.putNumber("Swerve/Gyro Pitch (deg)", getGyroPitch());
         SmartDashboard.putNumber("Swerve/Gyro Roll (deg)", getGyroRoll());
 

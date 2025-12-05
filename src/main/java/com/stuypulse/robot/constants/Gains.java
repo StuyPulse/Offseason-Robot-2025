@@ -21,9 +21,9 @@ public interface Gains {
     }
 
     public interface Wrist {
-        double kP = 3.596;
-        double kI = 0.0;
-        double kD = 0.05; 
+        double kP = 1.2f;
+        double kI = 1f;
+        double kD = 0.0; 
     }
     
     public interface Swerve {

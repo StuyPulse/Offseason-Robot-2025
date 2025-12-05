@@ -5,6 +5,8 @@
 
 package com.stuypulse.robot.constants;
 
+import javax.sound.sampled.Port;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -77,6 +79,22 @@ public interface Devices {
     }
 
     public interface Wrist {
+        public class Rotation {
+            public static TalonFXConfiguration getConfig() {
+            TalonFXConfiguration motor_config = new TalonFXConfiguration();
+    
+            motor_config.Feedback.RotorToSensorRatio = 1f/Constants.Wrist.GEAR_RATIO;
+            motor_config.Feedback.FeedbackRemoteSensorID = Ports.Wrist.WRIST_ENCODER;
+            motor_config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+
+            motor_config.MotorOutput = new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInverted(InvertedValue.Clockwise_Positive);
+
+            return motor_config;
+            }
+        }
+
         TalonFXConfig motor_config = new TalonFXConfig()
             .withCurrentLimitAmps(80)
             .withRampRate(0.25)
@@ -84,7 +102,7 @@ public interface Devices {
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withPIDConstants(0, 0, 0, 0)
             .withFFConstants(0, 0, 0, 0)
-            // .withRemoteSensor(Ports.Wrist.WRIST_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.Wrist.GEAR_RATIO)
+            .withRemoteSensor(Ports.Wrist.WRIST_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.Wrist.GEAR_RATIO)
             .withMotionProfile(0, 0);
 
         CANcoderConfiguration cc_config = new CANcoderConfiguration()

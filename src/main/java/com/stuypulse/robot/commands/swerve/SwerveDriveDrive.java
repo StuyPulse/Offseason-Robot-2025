@@ -50,7 +50,7 @@ public class SwerveDriveDrive extends Command {
     }
 
     private Vector2D getDriverInputAsVelocity() {
-        return new Vector2D(driver.getLeftStick().y, -driver.getLeftStick().x);
+        return new Vector2D(driver.getLeftStick().x, driver.getLeftStick().y);
     }
 
     @Override

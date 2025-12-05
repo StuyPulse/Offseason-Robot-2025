@@ -44,13 +44,14 @@ public interface Settings {
     }
     
     public interface Wrist {
-        Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
+        Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(2.0);
+        Rotation2d INTEGRATOR_TOLERANCE = Rotation2d.fromDegrees(25);
     }
 
     public interface Swerve {
         double MAX_MODULE_SPEED = 3.0;
         double MAX_MODULE_ACCEL = 4.0;
-        double MODULE_VELOCITY_DEADBAND = 0.05;
+        double MODULE_VELOCITY_DEADBAND = 0.00;
 
         SmartNumber MAX_VELOCITY = new SmartNumber("Swerve/Motion/Max Velocity (m per s)", 2.5);
         SmartNumber MAX_ACCELERATION = new SmartNumber("Swerve/Motion/Max Acceleration (m per s^2)", 3.0);
@@ -61,7 +62,7 @@ public interface Settings {
 
     public interface Driver {
         public interface Drive {
-            SmartNumber DEADBAND = new SmartNumber("Driver Settings/Drive/Deadband", 0.05);
+            SmartNumber DEADBAND = new SmartNumber("Driver Settings/Drive/Deadband", 0.1);
 
             SmartNumber RC = new SmartNumber("Driver Settings/Drive/RC", 0.05);
             SmartNumber POWER = new SmartNumber("Driver Settings/Drive/Power", 2);

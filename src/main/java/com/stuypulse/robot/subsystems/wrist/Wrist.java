@@ -4,9 +4,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Wrist extends SubsystemBase {
+public abstract class Wrist extends SubsystemBase {
     public static final Wrist instance;
-    public final WristState state;
+    public WristState state;
 
     static {
         instance = new WristImpl();
@@ -17,8 +17,9 @@ public class Wrist extends SubsystemBase {
     }
 
     public enum WristState {
-        FRONT(Rotation2d.fromDegrees(180f), 200), 
-        STOW(Rotation2d.fromDegrees(90f), 0); 
+        STOW(Rotation2d.fromDegrees(0f), 0), 
+        FRONT(Rotation2d.fromDegrees(90f), 200), 
+        BACK(Rotation2d.fromDegrees(-90f), 200); 
         
         private Rotation2d targetAngle;
         private double targetRPM;
@@ -36,10 +37,16 @@ public class Wrist extends SubsystemBase {
             return this.targetAngle;
         }
     }
+    
+    public void setState(WristState state) {
+        this.state = state;
+    }
 
     public Wrist() {
         this.state = WristState.STOW;
     }
+
+    public abstract void resetController(boolean forIntegration);
 
     @Override
     public void periodic() {
