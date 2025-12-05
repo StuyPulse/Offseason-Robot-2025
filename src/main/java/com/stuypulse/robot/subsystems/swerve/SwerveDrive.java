@@ -58,15 +58,14 @@ public class SwerveDrive extends SubsystemBase {
     protected SwerveDrive(SwerveModule... modules) {
         this.modules = modules;
 
-        gyro = new Pigeon2(Ports.Swerve.PIGEON, Settings.CANIVORE);
-        
+        gyro = new Pigeon2(Ports.Swerve.PIGEON, Settings.CANIVORE); 
+        gyro.getConfigurator().setYaw(Settings.Swerve.PIGEON_OFFSET/360f + gyro.getYaw().getValueAsDouble()); 
 
         kinematics = new SwerveDriveKinematics(getModuleOffsets());
 
         module2ds = new FieldObject2d[modules.length];
     }
 
-    
     public void initFieldObjects(Field2d field) {
         for (int i = 0; i < modules.length; i++) {
             module2ds[i] = field.getObject(modules[i].getName()+"-2d");

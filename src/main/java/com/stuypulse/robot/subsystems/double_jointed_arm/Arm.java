@@ -41,12 +41,21 @@ public abstract class Arm extends SubsystemBase{
     public enum ArmState {
         DEFAULT(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(Settings.DoubleJointedArm.Elbow.DEFAULT)),
         STOW(Rotation2d.fromDegrees(Settings.DoubleJointedArm.Shoulder.DEFAULT), Rotation2d.fromDegrees(-90f)),
+        UP(Rotation2d.fromDegrees(0.0), Rotation2d.fromDegrees(0.0)),
+        INTAKE_FRONT(Rotation2d.kZero, Rotation2d.kZero),
+        
         TEST_FRONT(Rotation2d.fromDegrees(45.0), Rotation2d.fromDegrees(0.0)),
         TEST_BACK(Rotation2d.fromDegrees(135.0), Rotation2d.fromDegrees(-180)),
         TEST_45(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(45)),
+        
         L4_BACK(Rotation2d.fromDegrees(84.4), Rotation2d.fromDegrees(137.2)),
         L4_BACK_OUT(Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(137.2)),
-        INT(Rotation2d.fromDegrees(90.0), Rotation2d.fromDegrees(90.0));
+        L3_BACK(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+        L3_BACK_OUT(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+        L2_BACK(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+        L2_BACK_OUT(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+        L1_BACK(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)),
+        L1_BACK_OUT(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0));
 
         private Rotation2d shoulderTargetAngle;
         private Rotation2d elbowTargetAngle;

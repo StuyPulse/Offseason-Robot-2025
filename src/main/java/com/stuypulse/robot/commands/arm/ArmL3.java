@@ -5,9 +5,9 @@ import com.stuypulse.robot.subsystems.double_jointed_arm.Arm.ArmState;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ArmTestUp extends ArmSetState {
-    public ArmTestUp() {
-            super(ArmState.UP);
+public class ArmL3 extends ArmSetState {
+    public ArmL3() {
+            super(ArmState.L3_BACK);
     }
 
     @Override

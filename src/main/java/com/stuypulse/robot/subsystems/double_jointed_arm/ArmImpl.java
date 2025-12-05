@@ -106,8 +106,6 @@ public class ArmImpl extends Arm {
         frontShoulderMotor.getConfigurator().apply(Devices.DoubleJointedArm.Shoulder.getMotorConfig());
         backShoulderMotor.getConfigurator().apply(Devices.DoubleJointedArm.Shoulder.getMotorConfig());
 
-        // Devices.DoubleJointedArm.Elbow.motor_config.configure(elbowMotor);
-
         backShoulderMotor.setControl(new Follower(frontShoulderMotor.getDeviceID(), false));
     }
 
@@ -159,7 +157,7 @@ public class ArmImpl extends Arm {
         if (!intermediate) {
             intermediate = true;
             storedState = targetState;
-            setState(ArmState.INT);
+            setState(ArmState.UP);
         }
     }
 
@@ -376,8 +374,8 @@ public class ArmImpl extends Arm {
                 .plus(calculateGMatrix());
         
         //Change ths sign of the torque based on the joint target velocities
-        torqueMatrix.set(0, 0, torqueMatrix.get(0, 0));// * Math.signum(velocities.get(0, 0)));
-        torqueMatrix.set(1, 0, torqueMatrix.get(1, 0));// * Math.signum(velocities.get(1, 0)));
+        torqueMatrix.set(0, 0, torqueMatrix.get(0, 0));
+        torqueMatrix.set(1, 0, torqueMatrix.get(1, 0));
 
         SmartDashboard.putNumber("DoubleJointedArm/Torque Shoulder", torqueMatrix.get(0,0));
         SmartDashboard.putNumber("DoubleJointedArm/Torque Elbow", torqueMatrix.get(1,0));

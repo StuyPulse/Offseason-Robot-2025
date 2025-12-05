@@ -58,6 +58,7 @@ public interface Settings {
         SmartNumber MAX_ANGULAR_VELOCITY = new SmartNumber("Swerve/Motion/Max Angular Velocity (rad per s)", Units.degreesToRadians(360));
         SmartNumber MAX_ANGULAR_ACCELERATION = new SmartNumber("Swerve/Motion/Max Angular Acceleration (rad per s^2)", Units.degreesToRadians(720));
 
+        double PIGEON_OFFSET = 0f; //deg
     }
 
     public interface Driver {
