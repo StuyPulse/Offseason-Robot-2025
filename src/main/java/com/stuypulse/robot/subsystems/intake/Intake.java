@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class Intake extends SubsystemBase{
 
-    public static final Intake instance;
+    public static final IntakeImpl instance;
 
     static {
-        instance = new Intakeimpl();
+        instance = new IntakeImpl();
     }
     
-    public Intake getInstance() {
+    public static IntakeImpl getInstance() {
         return instance;
     }
-     
+
+    public Intake() {}
 }

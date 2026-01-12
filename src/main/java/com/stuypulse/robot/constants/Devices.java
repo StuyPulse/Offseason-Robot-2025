@@ -59,7 +59,7 @@ public interface Devices {
             .withCurrentLimitAmps(80)
             .withRampRate(0.25)
             .withNeutralMode(NeutralModeValue.Brake)
-            .withInvertedValue(InvertedValue.Clockwise_Positive)
+            .withInvertedValue(InvertedValue.CounterClockwise_Positive)
             .withPIDConstants(0, 0, 0, 0)
             .withFFConstants(0, 0, 0, 0)
             .withSensorToMechanismRatio(0);

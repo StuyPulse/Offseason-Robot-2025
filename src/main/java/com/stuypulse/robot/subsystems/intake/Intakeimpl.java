@@ -8,16 +8,19 @@ import com.stuypulse.stuylib.network.SmartNumber;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Intakeimpl extends Intake {
+public class IntakeImpl extends Intake {
     private final TalonFX funnelMotor, rollerMotor;
     private SmartNumber setfunnelspeed, setRollerSpeed;
 
-    public Intakeimpl() {
+    public IntakeImpl() {
+        super();
         funnelMotor = new TalonFX(Ports.Intake.FUNNEL, "CANIVORE");
         Devices.Funnel.motor_config.configure(funnelMotor);
+        setfunnelspeed = new SmartNumber("Intake/Funnel Duty Cycle", 0);
 
         rollerMotor = new TalonFX(Ports.Intake.ROLLER, "CANIVORE");
         Devices.Roller.motor_config.configure(rollerMotor);
+        setRollerSpeed = new SmartNumber("Intake/Roller Duty Cycle", 0);
     }
 
     public double getFunnelRPM() {
