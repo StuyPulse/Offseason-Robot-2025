@@ -8,6 +8,12 @@ public interface Ports {
         int DEBUGGER = 2;
     }
 
+    public interface Intake {
+        int FUNNEL = 0;
+        int ROLLER = 32;
+        
+    }
+
     public interface DoubleJointedArm {
         public interface Shoulder {
             int FRONT_MOTOR = 14;

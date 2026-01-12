@@ -52,47 +52,31 @@ public interface Devices {
                 return motor_config;
             }
         }
-
-        public interface Elbow {
-            TalonFXConfig motor_config = new TalonFXConfig()
-                .withCurrentLimitAmps(80)
-                .withRampRate(0.25)
-                .withNeutralMode(NeutralModeValue.Brake)
-                .withInvertedValue(InvertedValue.Clockwise_Positive)
-                .withPIDConstants(0, 0, 0, 0)
-                .withFFConstants(0, 0, 0, 0)
-                .withGravityType(GravityTypeValue.Arm_Cosine)
-                .withSensorToMechanismRatio(0)
-                // .withRemoteSensor(Ports.DoubleJointedArm.Elbow.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.GEAR_RATIO)
-                .withMotionProfile(0, 0);
-            
-            CANcoderConfiguration cc_config = new CANcoderConfiguration()
-            .withMagnetSensor(
-                new MagnetSensorConfigs()
-                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                    .withMagnetOffset(Constants.DoubleJointedArm.Elbow.ENCODER_OFFSET_ROT)
-                    .withAbsoluteSensorDiscontinuityPoint(Constants.DoubleJointedArm.Elbow.ENCODER_UPPER_LIMIT_ROT));
-
-        }
     }
 
-    public interface Wrist {
+    public interface Funnel {
         TalonFXConfig motor_config = new TalonFXConfig()
             .withCurrentLimitAmps(80)
             .withRampRate(0.25)
-            .withNeutralMode(NeutralModeValue.Brake)    
+            .withNeutralMode(NeutralModeValue.Brake)
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withPIDConstants(0, 0, 0, 0)
             .withFFConstants(0, 0, 0, 0)
-            // .withRemoteSensor(Ports.Wrist.WRIST_ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.Wrist.GEAR_RATIO)
-            .withMotionProfile(0, 0);
+            .withSensorToMechanismRatio(0);
+            // .withRemoteSensor(Ports.DoubleJointedArm.Elbow.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.GEAR_RATIO)
+            // .withMotionProfile(0, 0);
 
-        CANcoderConfiguration cc_config = new CANcoderConfiguration()
-        .withMagnetSensor(
-            new MagnetSensorConfigs()
-                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-                .withMagnetOffset(Constants.Wrist.ENCODER_OFFSET_ROT)
-                .withAbsoluteSensorDiscontinuityPoint(1));
+    }
+
+    public interface Roller {
+        TalonFXConfig motor_config = new TalonFXConfig()
+        .withCurrentLimitAmps(80)
+        .withRampRate(0.25)
+        .withNeutralMode(NeutralModeValue.Brake)
+        .withInvertedValue(InvertedValue.Clockwise_Positive)
+        .withPIDConstants(0, 0, 0, 0)
+        .withFFConstants(0, 0, 0, 0)
+        .withSensorToMechanismRatio(0);
     }
 
    public interface Swerve {
