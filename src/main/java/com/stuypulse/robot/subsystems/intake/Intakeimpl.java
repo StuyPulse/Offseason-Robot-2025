@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class IntakeImpl extends Intake {
     private final TalonFX funnelMotor, rollerMotor;
     private SmartNumber setfunnelspeed, setRollerSpeed;
+    //private Intake state;
 
     public IntakeImpl() {
         super();
@@ -21,6 +22,8 @@ public class IntakeImpl extends Intake {
         rollerMotor = new TalonFX(Ports.Intake.ROLLER, "CANIVORE");
         Devices.Roller.motor_config.configure(rollerMotor);
         setRollerSpeed = new SmartNumber("Intake/Roller Duty Cycle", 0);
+
+        setIntakeState(IntakeState.STOW);
     }
 
     public double getFunnelRPM() {
@@ -34,7 +37,7 @@ public class IntakeImpl extends Intake {
     @Override
     public void periodic() {
         funnelMotor.setControl(new DutyCycleOut(setfunnelspeed.getAsDouble()));
-        rollerMotor.setControl(new DutyCycleOut(setRollerSpeed.getAsDouble()));
+        rollerMotor.setControl(new DutyCycleOut(getIntakeState().getIntakeCycle()));
 
         SmartDashboard.putNumber("Intake/Roller RPM", getRollerRPM());
         SmartDashboard.putNumber("Intake/Funnel RPM", getFunnelRPM());
