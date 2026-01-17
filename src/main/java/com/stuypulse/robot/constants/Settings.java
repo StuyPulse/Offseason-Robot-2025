@@ -17,7 +17,7 @@ public interface Settings {
     
     public interface Intake {
         public interface NeoIntake {
-            SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Neo Intake/Rollers/Percent Output (0 - 1)", 0.4);
+            SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Neo Intake/Rollers/Percent Output (0 - 1)", 1);
         }
 
         public interface SpringLoaded {

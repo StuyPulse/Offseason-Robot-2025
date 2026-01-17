@@ -14,7 +14,7 @@ public interface Ports {
         }
 
         public interface KrakenIntake {
-            int ROLLER = 67; // TODO: put real port
+            int ROLLER = 21;
         }
     }
 

@@ -67,13 +67,13 @@ public class RobotContainer {
 			.onFalse(new NeoIntakeStop());
 
 		// Spring Loaded Intake
-		driver.getLeftBumper()
-			.onTrue(new KrakenIntakeIntake())
-			.onFalse(new KrakenIntakeStop());
+		// driver.getLeftBumper()
+		// 	.onTrue(new KrakenIntakeIntake())
+		// 	.onFalse(new KrakenIntakeStop());
 
-		driver.getRightBumper()
-			.onTrue(new KrakenIntakeOuttake())
-			.onFalse(new KrakenIntakeStop());
+		// driver.getRightBumper()
+		// 	.onTrue(new KrakenIntakeOuttake())
+		// 	.onFalse(new KrakenIntakeStop());
 			
     }
 
