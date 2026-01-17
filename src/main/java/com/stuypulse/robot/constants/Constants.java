@@ -76,27 +76,32 @@ public interface Constants {
             }
         }
 
+        // Comment:
+        // Back Right - Bottom Right
+        // Back Left - Top Right
+        // 
+
         public interface FrontLeft {
             String ID = "Front Left";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.149902);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.1062011);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * +0.5, WIDTH * +0.5);
         }
 
         public interface BackLeft {
             String ID = "Back Left";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.270752);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.105222);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * -0.5, WIDTH * +0.5);
         }
 
         public interface BackRight {
             String ID = "Back Right";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(0.113037);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.225083);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * -0.5, WIDTH * -0.5);
         }
 
         public interface FrontRight {
             String ID = "Front Right";
-            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.441162);
+            Rotation2d ABSOLUTE_OFFSET = Rotation2d.fromRotations(-0.186766);
             Translation2d MODULE_OFFSET = new Translation2d(LENGTH * +0.5, WIDTH * -0.5);
         }
     }

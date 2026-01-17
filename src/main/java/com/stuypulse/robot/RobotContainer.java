@@ -49,8 +49,8 @@ public class RobotContainer {
 	/***************/
 
 	private void configureButtonBindings() {
-		driver.getRightButton()
-			.onTrue(new IntakeImpl().getInstance().setIntakeState().INTAKE);
+		// driver.getRightButton()
+		// 	.onTrue(new IntakeImpl().getInstance().setIntakeState().INTAKE);
     }
 
 	/**************/
