@@ -42,7 +42,7 @@ public class NeoIntakeImpl extends NeoIntake {
     public void periodic() {
         setMotorBasedOnState();
         SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current RPM", getIntakeRPM());
-        SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current Draw", getBusVoltage());
+        SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Bug Voltage", getBusVoltage());
         SmartDashboard.putString("Intake/Neo Intake/Rollers/Current State", getState().toString());
     }
 
