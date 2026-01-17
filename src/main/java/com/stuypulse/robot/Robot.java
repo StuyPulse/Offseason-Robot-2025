@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.stuypulse.robot.commands.intake.SetStates.IntakeStop;
+
 public class Robot extends TimedRobot {
 
     private static Alliance alliance;
@@ -33,6 +35,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         robot = new RobotContainer();
+        new IntakeStop();
     }
 
     @Override
@@ -83,6 +86,7 @@ public class Robot extends TimedRobot {
         if (auto != null) {
             auto.cancel();
         }
+        new IntakeStop();
     }
 
     @Override
