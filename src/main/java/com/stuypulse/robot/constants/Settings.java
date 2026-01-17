@@ -1,9 +1,7 @@
 package com.stuypulse.robot.constants;
 
-import com.stuypulse.stuylib.network.SmartBoolean;
 import com.stuypulse.stuylib.network.SmartNumber;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /*-
@@ -18,7 +16,7 @@ public interface Settings {
     double TARGET_DISTANCE_FROM_REEF = 0;
     
     public interface Intake {
-        SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 0.5);
+        SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 0.4);
     }
 
     public interface Swerve {
