@@ -16,7 +16,7 @@ public interface Settings {
     double TARGET_DISTANCE_FROM_REEF = 0;
     
     public interface Intake {
-        SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 0.4);
+        SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 1.0);
     }
 
     public interface Swerve {
