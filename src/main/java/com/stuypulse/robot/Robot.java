@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.stuypulse.robot.commands.krakenintake.KrakenIntakeStop;
 import com.stuypulse.robot.commands.neointake.NeoIntakeStop;
 
 public class Robot extends TimedRobot {
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         robot = new RobotContainer();
         new NeoIntakeStop();
+        new KrakenIntakeStop();
     }
 
     @Override
@@ -87,6 +89,7 @@ public class Robot extends TimedRobot {
             auto.cancel();
         }
         new NeoIntakeStop();
+        new KrakenIntakeStop();
     }
 
     @Override
