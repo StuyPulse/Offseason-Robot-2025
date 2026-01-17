@@ -8,8 +8,14 @@ public interface Ports {
         int DEBUGGER = 2;
     }
 
-    public interface Intake {
-        int ROLLER = 20;
+    public interface Intakes {
+        public interface NeoIntake {
+            int ROLLER = 20;
+        }
+
+        public interface KrakenIntake {
+            int ROLLER = 67; // TODO: put real port
+        }
     }
 
     public interface Swerve {
