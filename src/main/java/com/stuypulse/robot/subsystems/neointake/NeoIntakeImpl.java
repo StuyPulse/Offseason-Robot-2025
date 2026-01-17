@@ -34,10 +34,15 @@ public class NeoIntakeImpl extends NeoIntake {
         return rollerMotorEncoder.getVelocity();
     }
 
+    private double getBusVoltage() {
+        return rollerMotor.getBusVoltage();
+    }
+
     @Override
     public void periodic() {
         setMotorBasedOnState();
         SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current RPM", getIntakeRPM());
+        SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current Draw", getBusVoltage());
         SmartDashboard.putString("Intake/Neo Intake/Rollers/Current State", getState().toString());
     }
 

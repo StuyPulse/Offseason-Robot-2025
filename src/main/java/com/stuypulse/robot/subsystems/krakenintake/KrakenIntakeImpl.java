@@ -27,10 +27,15 @@ public class KrakenIntakeImpl extends KrakenIntake {
         return rollerMotor.getVelocity().getValueAsDouble();
     }
 
+    private double getSupplyVoltage() {
+        return rollerMotor.getSupplyVoltage().getValueAsDouble();
+    }
+
     @Override
     public void periodic() {
         setMotorBasedOnState();
         SmartDashboard.putNumber("Intake/Kraken Intake/Rollers/Current RPM", getIntakeRPM());
+        SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current Draw", getSupplyVoltage());
         SmartDashboard.putString("Intake/Kraken Intake/Rollers/Current State", getState().toString());
     }
 
