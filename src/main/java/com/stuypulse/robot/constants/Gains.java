@@ -1,7 +1,6 @@
 package com.stuypulse.robot.constants;
 
 import com.pathplanner.lib.config.PIDConstants;
-import com.stuypulse.stuylib.network.SmartNumber;
 
 public interface Gains {
     

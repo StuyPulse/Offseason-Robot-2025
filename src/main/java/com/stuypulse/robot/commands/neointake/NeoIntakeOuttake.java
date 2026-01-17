@@ -1,11 +1,10 @@
 package com.stuypulse.robot.commands.neointake;
 
-import com.stuypulse.robot.commands.neointake.SetIntakeState;
 import com.stuypulse.robot.subsystems.neointake.NeoIntake.NeoIntakeRollerState;
 
-public class IntakeOuttake extends SetIntakeState{
+public class NeoIntakeOuttake extends SetNeoIntakeState {
     
-    public IntakeOuttake() {
+    public NeoIntakeOuttake() {
         super(NeoIntakeRollerState.OUTTAKING);
     }
 
