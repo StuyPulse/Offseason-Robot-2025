@@ -2,7 +2,6 @@ package com.stuypulse.robot.subsystems.intake;
 
 import com.stuypulse.robot.constants.Settings;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class Intake extends SubsystemBase{

@@ -9,7 +9,7 @@ public interface Ports {
     }
 
     public interface Intake {
-        int ROLLER = 32;
+        int ROLLER = 20;
     }
 
     public interface Swerve {
