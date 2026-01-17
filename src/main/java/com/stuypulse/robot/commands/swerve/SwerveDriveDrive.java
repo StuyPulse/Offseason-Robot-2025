@@ -38,7 +38,7 @@ public class SwerveDriveDrive extends Command {
 
         turn = IStream.create(driver::getRightX)
             .filtered(
-                x -> -x,
+                x -> x,
                 x -> SLMath.deadband(x, Turn.DEADBAND.get()),
                 x -> SLMath.spow(x, Turn.POWER.get()),
                 x -> x * Turn.MAX_TELEOP_TURN_SPEED.get(),

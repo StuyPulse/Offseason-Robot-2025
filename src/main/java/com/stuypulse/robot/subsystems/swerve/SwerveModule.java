@@ -37,7 +37,8 @@ public abstract class SwerveModule extends SubsystemBase {
     public abstract SwerveModulePosition getModulePosition();
 
     public final SwerveModuleState getState() {
-        return new SwerveModuleState(getVelocity(), getAngle());
+        // TODO: Kalimul's Fix.
+        return new SwerveModuleState(getVelocity(), getAngle().plus(Rotation2d.fromDegrees(90)));
     }
 
     public final void setTargetState(SwerveModuleState state) {
