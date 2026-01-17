@@ -59,10 +59,10 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		
 		// Reset Pose
-		driver.getBottomButton()
+		driver.getDPadDown()
 			.onTrue(new Reset());
 
-		// Static Intake
+		// Neo Intake
 		driver.getLeftTriggerButton()
 			.onTrue(new NeoIntakeIntake())
 			.onFalse(new NeoIntakeStop());
@@ -71,14 +71,14 @@ public class RobotContainer {
 			.onTrue(new NeoIntakeOuttake())
 			.onFalse(new NeoIntakeStop());
 
-		// Spring Loaded Intake
-		// driver.getLeftBumper()
-		// 	.onTrue(new KrakenIntakeIntake())
-		// 	.onFalse(new KrakenIntakeStop());
+		// Kraken Intake
+		driver.getLeftBumper()
+			.onTrue(new KrakenIntakeIntake())
+			.onFalse(new KrakenIntakeStop());
 
-		// driver.getRightBumper()
-		// 	.onTrue(new KrakenIntakeOuttake())
-		// 	.onFalse(new KrakenIntakeStop());
+		driver.getRightBumper()
+			.onTrue(new KrakenIntakeOuttake())
+			.onFalse(new KrakenIntakeStop());
 			
     }
 
