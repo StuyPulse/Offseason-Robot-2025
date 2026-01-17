@@ -18,7 +18,6 @@ public interface Settings {
     double TARGET_DISTANCE_FROM_REEF = 0;
     
     public interface Intake {
-        SmartBoolean INTAKE_REVERSED = new SmartBoolean("Intake/Rollers/Reversed", false);
         SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 0.5);
     }
 

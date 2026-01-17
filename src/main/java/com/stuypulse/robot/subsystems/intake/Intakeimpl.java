@@ -26,8 +26,8 @@ public class IntakeImpl extends Intake {
     }
 
     private void setMotorBasedOnState() {
-        double speed = MathUtil.clamp(state.getIntakeRollerSpeed(), 0.0, 1.0);
-        rollerMotor.set(speed * (state.getIntakeReversed() ? -1 : 1));
+        double speed = MathUtil.clamp(state.getIntakeRollerSpeed(), -1.0, 1.0);
+        rollerMotor.set(speed);
     }
 
     private double getIntakeRPM() {

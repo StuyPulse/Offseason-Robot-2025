@@ -18,24 +18,18 @@ public abstract class Intake extends SubsystemBase{
     }
 
     public enum IntakeRollerState {
-        INTAKING(Settings.Intake.INTAKE_SPEED.doubleValue(), Settings.Intake.INTAKE_REVERSED.getAsBoolean()),
-        OUTTAKING(Settings.Intake.INTAKE_SPEED.doubleValue(), !Settings.Intake.INTAKE_REVERSED.getAsBoolean()),
-        STOP(0.0, false);
+        INTAKING(Settings.Intake.INTAKE_SPEED.doubleValue()),
+        OUTTAKING(-Settings.Intake.INTAKE_SPEED.doubleValue()),
+        STOP(0.0);
 
         private Number intake_roller_speed;
-        private Boolean intake_reversed;
 
-        private IntakeRollerState(Number intake_roller_speed, Boolean intake_reversed) {
+        private IntakeRollerState(Number intake_roller_speed) {
             this.intake_roller_speed = intake_roller_speed;
-            this.intake_reversed = intake_reversed;
         }
 
         public double getIntakeRollerSpeed() {
             return this.intake_roller_speed.doubleValue();
-        }
-
-        public boolean getIntakeReversed() {
-            return this.intake_reversed;
         }
     }
 
