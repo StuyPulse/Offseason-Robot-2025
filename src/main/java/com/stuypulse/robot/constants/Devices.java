@@ -40,8 +40,16 @@ import com.revrobotics.spark.config.SparkMaxConfig;
  */
 public interface Devices {
 
-    public interface Intake {
-        SparkBaseConfig motorConfig = new SparkFlexConfig().inverted(false).idleMode(IdleMode.kBrake);
+    public interface Intakes {
+        public interface NeoIntake {
+            SparkBaseConfig motorConfig = new SparkFlexConfig().inverted(false).idleMode(IdleMode.kBrake);
+        }
+
+        public interface KrakenIntake {
+            TalonFXConfig motorConfig = new TalonFXConfig()
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInvertedValue(InvertedValue.CounterClockwise_Positive);
+        }
     }
 
    public interface Swerve {

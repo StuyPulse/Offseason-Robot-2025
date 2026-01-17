@@ -1,4 +1,4 @@
-package com.stuypulse.robot.subsystems.intake;
+package com.stuypulse.robot.subsystems.neointake;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
@@ -11,16 +11,16 @@ import com.stuypulse.robot.constants.Ports;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class IntakeImpl extends Intake {
+public class NeoIntakeImpl extends NeoIntake {
 
     private final SparkFlex rollerMotor;
     private final RelativeEncoder rollerMotorEncoder;
 
-    public IntakeImpl() {
+    public NeoIntakeImpl() {
         super();
 
-        rollerMotor = new SparkFlex(Ports.Intake.ROLLER, MotorType.kBrushless);
-        rollerMotor.configure(Devices.Intake.motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rollerMotor = new SparkFlex(Ports.Intakes.NeoIntake.ROLLER, MotorType.kBrushless);
+        rollerMotor.configure(Devices.Intakes.NeoIntake.motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         rollerMotorEncoder = rollerMotor.getEncoder();
     }
@@ -37,8 +37,8 @@ public class IntakeImpl extends Intake {
     @Override
     public void periodic() {
         setMotorBasedOnState();
-        SmartDashboard.putNumber("Intake/Rollers/Current RPM", getIntakeRPM());
-        SmartDashboard.putString("Intake/Rollers/Current State", getState().toString());
+        SmartDashboard.putNumber("Intake/Neo Intake/Rollers/Current RPM", getIntakeRPM());
+        SmartDashboard.putString("Intake/Neo Intake/Rollers/Current State", getState().toString());
     }
 
 }
