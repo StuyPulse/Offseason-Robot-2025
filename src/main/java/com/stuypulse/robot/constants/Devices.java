@@ -24,6 +24,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 // import com.stuypulse.robot.constants.Devices.TalonFXConfig;
@@ -39,44 +40,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
  */
 public interface Devices {
 
-    public interface DoubleJointedArm {
-        public class Shoulder {
-            public static TalonFXConfiguration getMotorConfig() {
-                TalonFXConfiguration motor_config = new TalonFXConfiguration();
-    
-                motor_config.Feedback.SensorToMechanismRatio = Constants.DoubleJointedArm.Shoulder.MOTOR_GEAR_RATIO;
-                motor_config.Feedback.RotorToSensorRatio = Constants.DoubleJointedArm.Shoulder.ENCODER_GEAR_RATIO;
-
-                motor_config.MotorOutput = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
-
-                return motor_config;
-            }
-        }
-    }
-
-    public interface Funnel {
-        TalonFXConfig motor_config = new TalonFXConfig()
-            .withCurrentLimitAmps(80)
-            .withRampRate(0.25)
-            .withNeutralMode(NeutralModeValue.Brake)
-            .withInvertedValue(InvertedValue.CounterClockwise_Positive)
-            .withPIDConstants(0, 0, 0, 0)
-            .withFFConstants(0, 0, 0, 0)
-            .withSensorToMechanismRatio(0);
-            // .withRemoteSensor(Ports.DoubleJointedArm.Elbow.ENCODER, FeedbackSensorSourceValue.RemoteCANcoder, Constants.DoubleJointedArm.Elbow.GEAR_RATIO)
-            // .withMotionProfile(0, 0);
-
-    }
-
-    public interface Roller {
-        TalonFXConfig motor_config = new TalonFXConfig()
-        .withCurrentLimitAmps(80)
-        .withRampRate(0.25)
-        .withNeutralMode(NeutralModeValue.Brake)
-        .withInvertedValue(InvertedValue.Clockwise_Positive)
-        .withPIDConstants(0, 0, 0, 0)
-        .withFFConstants(0, 0, 0, 0)
-        .withSensorToMechanismRatio(0);
+    public interface Intake {
+        SparkBaseConfig motorConfig = new SparkFlexConfig().inverted(false).idleMode(IdleMode.kBrake);
     }
 
    public interface Swerve {

@@ -1,46 +1,44 @@
 package com.stuypulse.robot.subsystems.intake;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Ports;
-import com.stuypulse.stuylib.network.SmartNumber;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeImpl extends Intake {
-    private final TalonFX funnelMotor, rollerMotor;
-    private SmartNumber setfunnelspeed, setRollerSpeed;
-    //private Intake state;
+
+    private final SparkFlex rollerMotor;
+    private final RelativeEncoder rollerMotorEncoder;
 
     public IntakeImpl() {
         super();
-        funnelMotor = new TalonFX(Ports.Intake.FUNNEL, "CANIVORE");
-        Devices.Funnel.motor_config.configure(funnelMotor);
-        setfunnelspeed = new SmartNumber("Intake/Funnel Duty Cycle", 0);
 
-        rollerMotor = new TalonFX(Ports.Intake.ROLLER, "CANIVORE");
-        Devices.Roller.motor_config.configure(rollerMotor);
-        setRollerSpeed = new SmartNumber("Intake/Roller Duty Cycle", 0);
+        rollerMotor = new SparkFlex(Ports.Intake.ROLLER, MotorType.kBrushless);
+        rollerMotor.configure(Devices.Intake.motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        setIntakeState(IntakeState.STOW);
+        rollerMotorEncoder = rollerMotor.getEncoder();
     }
 
-    public double getFunnelRPM() {
-        return funnelMotor.getVelocity().getValueAsDouble() * 60;
+    private void setMotorBasedOnState() {
+        double speed = MathUtil.clamp(state.getIntakeRollerSpeed(), 0.0, 1.0);
+        rollerMotor.set(speed * (state.getIntakeReversed() ? -1 : 1));
     }
 
-    public double getRollerRPM() {
-        return rollerMotor.getVelocity().getValueAsDouble() * 60;
+    private double getIntakeRPM() {
+        return rollerMotorEncoder.getVelocity();
     }
-    
+
     @Override
     public void periodic() {
-        funnelMotor.setControl(new DutyCycleOut(setfunnelspeed.getAsDouble()));
-        rollerMotor.setControl(new DutyCycleOut(getIntakeState().getIntakeCycle()));
-
-        SmartDashboard.putNumber("Intake/Roller RPM", getRollerRPM());
-        SmartDashboard.putNumber("Intake/Funnel RPM", getFunnelRPM());
+        setMotorBasedOnState();
+        SmartDashboard.putNumber("Intake/Rollers/Current RPM", getIntakeRPM());
+        SmartDashboard.putString("Intake/Rollers/Current State", getState().toString());
     }
-    
+
 }

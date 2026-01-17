@@ -4,21 +4,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.stuypulse.stuylib.network.SmartNumber;
 
 public interface Gains {
-    public interface DoubleJointedArm {
-        public interface ShoulderPIDF {
-                double kP = 1f;
-                double kI = 0.0;
-                double kD = 0.002;
-                double kF = .5;
-        }
-        
-        public interface ElbowPIDF {
-                double kP = 1.625;
-                double kI = 0.0;
-                double kD = 0.005;
-                double kF = .25;
-        }
-    }
+    
     public interface Swerve {
 
         public interface Alignment {
@@ -40,21 +26,6 @@ public interface Gains {
             double kS = 0.4825;
             double kV = 1.7516;
             double kA = 0.075654;
-        }
-    }
-
-    public interface Elevator {
-        public interface PID {
-            SmartNumber kP = new SmartNumber("Elevator/Controller/kP", 6.25);
-            SmartNumber kI = new SmartNumber("Elevator/Controller/kI",0.0);
-            SmartNumber kD = new SmartNumber("Elevator/Controller/kD",0.1);
-        }
-
-        public interface FF {
-            SmartNumber kS = new SmartNumber("Elevator/Controller/kS",0.0);
-            SmartNumber kV = new SmartNumber("Elevator/Controller/kV",0.0);
-            SmartNumber kA = new SmartNumber("Elevator/Controller/kA", 0.0);
-            SmartNumber kG = new SmartNumber("Elevator/Controller/kG", 1.0);
         }
     }
 }

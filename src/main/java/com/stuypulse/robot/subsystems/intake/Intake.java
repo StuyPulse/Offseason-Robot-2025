@@ -1,53 +1,55 @@
 package com.stuypulse.robot.subsystems.intake;
 
+import com.stuypulse.robot.constants.Settings;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class Intake extends SubsystemBase{
 
-    public static final IntakeImpl instance;
-
-    private IntakeState intake;
+    public static final Intake instance;
 
     static {
         instance = new IntakeImpl();
     }
-    
-    public static IntakeImpl getInstance() {
+
+    public static Intake getInstance() {
         return instance;
     }
 
-    public Intake() {
-        intake = IntakeState.STOW;
-    }
+    public enum IntakeRollerState {
+        INTAKING(Settings.Intake.INTAKE_SPEED.doubleValue(), Settings.Intake.INTAKE_REVERSED.getAsBoolean()),
+        OUTTAKING(Settings.Intake.INTAKE_SPEED.doubleValue(), !Settings.Intake.INTAKE_REVERSED.getAsBoolean()),
+        STOP(0.0, false);
 
-    public enum IntakeState {
-        STOW(0.0),
-        INTAKE(0.5);
+        private Number intake_roller_speed;
+        private Boolean intake_reversed;
 
-        private double intakeCycle;
-
-        private IntakeState(double dutyCycle) {
-            this.intakeCycle = dutyCycle;
-        } 
-
-        public double getIntakeCycle() {
-            return intakeCycle;
+        private IntakeRollerState(Number intake_roller_speed, Boolean intake_reversed) {
+            this.intake_roller_speed = intake_roller_speed;
+            this.intake_reversed = intake_reversed;
         }
 
-        public void setIntakeCycle(double dutyCycle) {
-            this.intakeCycle = dutyCycle;
+        public double getIntakeRollerSpeed() {
+            return this.intake_roller_speed.doubleValue();
+        }
+
+        public boolean getIntakeReversed() {
+            return this.intake_reversed;
         }
     }
 
-    public void setIntakeState(IntakeState state) {
-        this.intake = state;
+    protected IntakeRollerState state;
+
+    protected Intake() {
+        this.state = IntakeRollerState.STOP;
     }
-    public IntakeState getIntakeState() {
-        return intake;
+
+    public IntakeRollerState getState() {
+        return state;
     }
-    @Override
-    public void periodic() {
-        
+
+    public void setState(IntakeRollerState state) {
+        this.state = state;
     }
 }

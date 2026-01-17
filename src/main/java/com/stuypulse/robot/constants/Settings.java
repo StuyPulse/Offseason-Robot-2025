@@ -1,5 +1,6 @@
 package com.stuypulse.robot.constants;
 
+import com.stuypulse.stuylib.network.SmartBoolean;
 import com.stuypulse.stuylib.network.SmartNumber;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,35 +17,9 @@ public interface Settings {
     String CANIVORE = "CANIVORE";
     double TARGET_DISTANCE_FROM_REEF = 0;
     
-    public interface DoubleJointedArm {
-        public static final double PATH_DT = 0.1; // Time between path points (sec)
-        public static final double SPLINE_DURATION = 0.5; // Duration per spline segment
-
-        public interface Shoulder {
-            double DEFAULT = 90.0;
-            double L2 = 0.0;
-            double L3 = 0.0;
-            double L4 = 0.0;
-
-            double TOLERANCE = .05;
-            
-            Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
-        }
-        
-        public interface Elbow {
-            double DEFAULT = -90.0;
-            double L2 = 0.0;
-            double L3 = 0.0;
-            double L4 = 0.0;
-            
-            double TOLERANCE = 0.1;
-
-            Rotation2d ANGLE_OFFSET = Rotation2d.fromDegrees(0.0);
-        }
-    }
-    
-    public interface Wrist {
-        Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5.0);
+    public interface Intake {
+        SmartBoolean INTAKE_REVERSED = new SmartBoolean("Intake/Rollers/Reversed", false);
+        SmartNumber INTAKE_SPEED = new SmartNumber("Intake/Rollers/Percent Output (0 - 1)", 0.5);
     }
 
     public interface Swerve {

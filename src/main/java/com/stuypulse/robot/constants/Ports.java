@@ -9,28 +9,7 @@ public interface Ports {
     }
 
     public interface Intake {
-        int FUNNEL = 0;
         int ROLLER = 32;
-        
-    }
-
-    public interface DoubleJointedArm {
-        public interface Shoulder {
-            int FRONT_MOTOR = 14;
-            int BACK_MOTOR = 15;
-            int ENCODER = 17;
-        }
-
-        public interface Elbow {
-            int MOTOR = 16;
-            int ENCODER = 18;
-        }
-
-    }
-
-    public interface Wrist {
-        int WRIST_MOTOR = 19;
-        int WRIST_ENCODER = 20;
     }
 
     public interface Swerve {

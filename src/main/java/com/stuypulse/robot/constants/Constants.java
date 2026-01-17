@@ -9,58 +9,6 @@ public interface Constants {
     double LENGTH_WITH_BUMPERS_METERS = Units.inchesToMeters(30);
     double WIDTH_WITH_BUMPERS_METERS = Units.inchesToMeters(30);
 
-    public interface DoubleJointedArm {
-        double BASE_HEIGHT = 0.2032; // 8 in -> 0.2032 m
-        
-        public interface Shoulder {
-            double MAX_TORQUE = 7.09;
-
-            double LENGTH = 0.9271; // 36.5 in -> 0.9779 m
-            double WIDTH = Units.inchesToMeters(2);
-            double MASS = 0.51845608; // 1.143 lbs -> 0.51845608 kg
-
-            double MOTOR_GEAR_RATIO = 3515.0 / 27.0;
-            double ENCODER_GEAR_RATIO = 1.0 / 4.625;
-            double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
-
-            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(2.1 + Math.toRadians(29f)).getRotations();
-            double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
-
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(0);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
-
-            double maxVelocity = 2 * Math.PI * 5800f/MOTOR_GEAR_RATIO; // rad/s
-            double maxAcceleration = MAX_TORQUE / 0.87; // 1.69 is the moment of inertia at the stowed position -- accel is in rad/s^2 
-        }
-
-        public interface Elbow {
-            double MAX_TORQUE = 7.09; //nm
-
-            double LENGTH = 0.519884533; // 20.467895 in -> 0.519884533 m
-            double WIDTH = Units.inchesToMeters(2.25);
-            double MASS = 0.39780051; // 0.877 lbs -> 0.39780051 kg
-
-            double MOTOR_GEAR_RATIO = 40000.0 / 399.0;
-            double ENCODER_GEAR_RATIO = 26f / 84f;
-            double GEAR_RATIO = MOTOR_GEAR_RATIO * ENCODER_GEAR_RATIO;
-
-            //double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(-49.486).getRotations();
-            double ENCODER_OFFSET_ROT = Rotation2d.fromRadians(0.707827 - Math.PI / 2.0 + 7.0*Math.PI / 180.0 + Math.toRadians(24f)).getRotations();
-            double ENCODER_UPPER_LIMIT_ROT = Rotation2d.fromDegrees(0.0).getRotations();
-
-            Rotation2d MIN_ANGLE = Rotation2d.fromDegrees(-180);
-            Rotation2d MAX_ANGLE = Rotation2d.fromDegrees(180);
-
-            double maxVelocity = 2 * Math.PI * 5800f/MOTOR_GEAR_RATIO; // rad/s
-            double maxAcceleration = MAX_TORQUE / 0.189; // rad/s^2
-        }
-    }
-
-    public interface Wrist {
-        double MASS = 2.26796; // 5 lbs -> 2.26796 kg
-        double GEAR_RATIO = 1/1;
-        double ENCODER_OFFSET_ROT = Rotation2d.fromDegrees(0).getRotations();
-    }
 
     public interface Swerve {
         double WIDTH = Units.inchesToMeters(18.75);

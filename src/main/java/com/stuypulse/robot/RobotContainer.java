@@ -6,10 +6,12 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.DoNothingAuton;
+import com.stuypulse.robot.commands.intake.SetStates.IntakeIntake;
+import com.stuypulse.robot.commands.intake.SetStates.IntakeOuttake;
+import com.stuypulse.robot.commands.intake.SetStates.IntakeStop;
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.intake.Intake;
-import com.stuypulse.robot.subsystems.intake.IntakeImpl;
 import com.stuypulse.robot.subsystems.swerve.SwerveDrive;
 import com.stuypulse.stuylib.input.Gamepad;
 import com.stuypulse.stuylib.input.gamepads.AutoGamepad;
@@ -25,14 +27,14 @@ public class RobotContainer {
     public final Gamepad operator = new AutoGamepad(Ports.Gamepad.OPERATOR);
     
     // Subsystem
-	private final IntakeImpl blyat = new IntakeImpl();
+	private final Intake intake = Intake.getInstance();
 	private final SwerveDrive swerve = SwerveDrive.getInstance();
 
 	// Autons
 	private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
 	public RobotContainer() {
-		// configureButtonBindings();
+		configureButtonBindings();
 		configureDefaultCommands();
 	}
 
@@ -49,8 +51,15 @@ public class RobotContainer {
 	/***************/
 
 	private void configureButtonBindings() {
-		// driver.getRightButton()
-		// 	.onTrue(new IntakeImpl().getInstance().setIntakeState().INTAKE);
+
+		driver.getLeftTriggerButton()
+			.onTrue(new IntakeIntake())
+			.onFalse(new IntakeStop());
+
+		driver.getRightTriggerButton()
+			.onTrue(new IntakeOuttake())
+			.onFalse(new IntakeStop());
+			
     }
 
 	/**************/
