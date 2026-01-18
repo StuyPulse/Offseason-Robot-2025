@@ -239,7 +239,7 @@ public class SwerveDrive extends SubsystemBase {
             module2ds[i].setPose(Robot.isBlue() ? modulePose : Field.transformToOppositeAlliance(modulePose));
         }
 
-        SmartDashboard.putNumber("Swerve/Gyro Angle (deg)", getGyroPitch());
+        SmartDashboard.putNumber("Swerve/Gyro Angle (deg)", getGyroAngle().getDegrees());
         SmartDashboard.putNumber("Swerve/Gyro Pitch (deg)", getGyroPitch());
         SmartDashboard.putNumber("Swerve/Gyro Roll (deg)", getGyroRoll());
 
