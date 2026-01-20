@@ -3,6 +3,7 @@ package com.stuypulse.robot.subsystems.krakenintake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.stuypulse.robot.constants.Devices;
 import com.stuypulse.robot.constants.Ports;
+import com.stuypulse.robot.constants.Settings;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,10 +12,10 @@ public class KrakenIntakeImpl extends KrakenIntake {
 
     private final TalonFX rollerMotor;
 
-    public KrakenIntakeImpl() {
+    public KrakenIntakeImpl(int krakenID) {
         super();
 
-        rollerMotor = new TalonFX(Ports.Intakes.KrakenIntake.ROLLER);
+        rollerMotor = new TalonFX(krakenID, Settings.CANIVORE);
         Devices.Intakes.KrakenIntake.motorConfig.configure(rollerMotor);
     }
 

@@ -1,6 +1,8 @@
 package com.stuypulse.robot.subsystems.krakenintake;
 
 import com.stuypulse.robot.constants.Settings;
+import com.stuypulse.robot.constants.Ports.Intakes;
+import com.stuypulse.robot.constants.Settings.Intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -9,7 +11,7 @@ public abstract class KrakenIntake extends SubsystemBase{
     public static final KrakenIntake instance;
 
     static {
-        instance = new KrakenIntakeImpl();
+        instance = new KrakenIntakeImpl(Intakes.KrakenIntake.ROLLER);
     }
 
     public static KrakenIntake getInstance() {

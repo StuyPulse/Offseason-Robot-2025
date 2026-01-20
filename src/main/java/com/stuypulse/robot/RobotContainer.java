@@ -14,7 +14,6 @@ import com.stuypulse.robot.commands.neointake.NeoIntakeOuttake;
 import com.stuypulse.robot.commands.neointake.NeoIntakeStop;
 import com.stuypulse.robot.commands.odometry.Reset;
 import com.stuypulse.robot.commands.swerve.SwerveDriveDrive;
-import com.stuypulse.robot.commands.swerve.SwerveDriveResetRotation;
 import com.stuypulse.robot.constants.Ports;
 import com.stuypulse.robot.subsystems.krakenintake.KrakenIntake;
 import com.stuypulse.robot.subsystems.neointake.NeoIntake;

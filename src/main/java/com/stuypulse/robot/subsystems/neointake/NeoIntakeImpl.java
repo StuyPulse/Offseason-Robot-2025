@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NeoIntakeImpl extends NeoIntake {
 
-    private final SparkFlex rollerMotor1;
+    private final SparhkFlex rollerMotor1;
     private final SparkFlex rollerMotor2;
     private final RelativeEncoder rollerMotor1Encoder;
     private final RelativeEncoder rollerMotor2Encoder;
